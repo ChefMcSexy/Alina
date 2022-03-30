@@ -40,3 +40,9 @@ See all process [HERE](https://github.com/Sn0wAlice/Alina/wiki)
 > not good code BUT WORKING !
 
 
+# Tor sherlock
+
+We wan't to find the tor hosting server with the `Host` header usurpation.
+
+beta testing for the moment. available in the Alina next update
+
