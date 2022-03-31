@@ -1,2 +1,0 @@
-nudenet
-tensorflow
