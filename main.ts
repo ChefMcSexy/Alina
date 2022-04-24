@@ -16,7 +16,7 @@ async function main() {
     let userChoise = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
 
     if (userChoise == "1") {
-        new TorIndexer().main()
+        await new TorIndexer().main()
     } else if (userChoise == "2") {
         new TorSherlock().init()
     } else if (userChoise == "@") {
@@ -27,9 +27,9 @@ async function main() {
         console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
         main()
     }
+
+    main()
 }
-
-
 
 
 main()

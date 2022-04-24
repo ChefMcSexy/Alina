@@ -37,4 +37,8 @@ export class utils {
         }
         return ipList
     }
+
+    public createDatabaseDir(){
+        Deno.mkdirSync("./db", { recursive: true })
+    }
 }

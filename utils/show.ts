@@ -16,6 +16,12 @@ let text_menu = ink.colorize(`
 [<yellow>@</yellow>] - <blue>Exit</blue>`)
 
 
+let text_disclaimer = ink.colorize(`
+⚠️<red> Disclaimer</red>
+<blue>Alina</blue> is a <red>safety network</red> for the <blue>Tor</blue> network.
+The Tor🧄 indexer can index extremely large amount of data and this data can be illegal 🔞
+`)
+
 export class show {
     public showWelcome() {
         console.log(text_welcome)
@@ -30,8 +36,25 @@ export class show {
         console.log(text_menu)
     }
 
+
+    public showTorDisclamer(){
+        console.log(text_disclaimer)
+    }
+
     public log(message){
         console.log(ink.colorize("[<magenta>Alina</magenta>] "+message))
+    }
+    public torindexerlog(message){
+        console.log(ink.colorize("[<magenta>Tor Indexer</magenta>] "+message))
+    }
+    public infos(message){
+        console.log(ink.colorize("[<blue>Infos</blue>] "+message))
+    }
+    public error(message){
+        console.log(ink.colorize("[<red>Error</red>] "+message))
+    }
+    public input(message){
+        return ink.colorize("[<yellow>Input</yellow>] "+message)
     }
 }
 

@@ -82,8 +82,10 @@ If you are not able to install me in the tutorial even with the help scripts inc
   - try to detect if a ip is hidding domain hosting (clear & tor)
   - make some Tor stats generation (TODO)
 - **Tor indexer**
-  - Scrawl Tor network and looks for extreme content to repport (migrating v1)
+  - Scrawl Tor network
   - Act like a local Tor proxy (todo)
+
+<br>
 ... SOON ...
 
 # Contributors

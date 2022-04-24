@@ -18,15 +18,18 @@ export class validator{
         }\r`))
     }
 
-    public async fail(fatal?:boolean){
+    public async fail(fatal:boolean){
         await Deno.stdout.write(enc(`${this.message} ${
             ink.colorize(`<red>FAIL</red>\n`)
         }\r`))
         if(fatal){
-            Deno.exit(1)
+            this.fatal()
         }
     }
 
+    private fatal(){
+        Deno.exit(1)
+    }
 
     public async custom_validate(message){
         await Deno.stdout.write(enc(`${this.message} ${
