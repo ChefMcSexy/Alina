@@ -7,9 +7,14 @@ const server = serve({hostname: config.hostname, port: config.port });
 let domainDatabase = [] //just a list of domains
 let urlDatabase = [] // little bit more complex, a list of urls
 let urlWaiting = []
+let orphenlanIMG = []
+let db
 
 try{
     domainDatabase = JSON.parse(Deno.readTextFileSync("./db/domains.json"))
+} catch(err){}
+try{
+    orphenlanIMG = JSON.parse(Deno.readTextFileSync("./db/orphenlanIMG.json"))
 } catch(err){}
 try {
     urlDatabase = JSON.parse(Deno.readTextFileSync("./db/urls.json"))
@@ -30,6 +35,123 @@ setInterval(() => {
 async function saveDatabase(){
     await Deno.writeTextFile("./db/domains.json", JSON.stringify(domainDatabase))
     await Deno.writeTextFile("./db/urls.json", JSON.stringify(urlDatabase))
+}
+
+setInterval(() => {
+    try{
+        let add = Deno.readTextFileSync("./db/add").split('\n')
+        domainDatabase = domainDatabase.concat(add)
+        urlDatabase = urlDatabase.concat(add)
+        Deno.removeSync("./db/add")
+    } catch(err){}
+}, 10000)
+
+
+//data loader
+setInterval(() => {
+    loadDatabase()
+}, 10000)
+
+loadDatabase()
+async function loadDatabase() {
+    //we need to get all the data from the database
+    let letterDispo = await exploreDirSimple('./db/data/')
+    let tmpDomainList = []
+    let tmpDB = []
+    for(let i = 0; i < letterDispo.length; i++){
+        let letter = letterDispo[i]
+        let letterDir = await exploreDirSimple('./db/data/'+letter+"/")
+        for(let j = 0; j < letterDir.length; j++){
+            try{
+                let domain = letterDir[j]
+                tmpDomainList.push("./db/data/"+domain.split('')[0]+"/"+domain)
+                let dinfo = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json"))
+                tmpDB.push({
+                    domain: domain,
+                    crypto: JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json")),
+                    url: dinfo.url,
+                    content: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/content"),
+                    images: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/images"),
+                    videos: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/videos"),
+                    email: dinfo.email
+                })
+            } catch(err){}
+        }
+    }
+    
+
+    //cool but we need to remove the data dupluction in images/videos/crypto
+    for(let i = 0; i < tmpDB.length; i++){
+        let img = []
+        for(let j = 0; j < tmpDB[i].images.length; j++){
+            let tmp = tmpDB[i].images[j]
+            //console.log(tmp)
+            for(let k = 0; k < tmp.length; k++){
+                if(!img.includes(tmp[k])){
+                    img.push(tmp[k])
+                }
+            }
+        }
+        tmpDB[i].images = img
+    }
+    //same for videos
+    for(let i = 0; i < tmpDB.length; i++){
+        let vid = []
+        for(let j = 0; j < tmpDB[i].videos.length; j++){
+            let tmp = tmpDB[i].videos[j]
+            for(let k = 0; k < tmp.length; k++){
+                if(!vid.includes(tmp[k])){
+                    vid.push(tmp[k])
+                }
+            }
+        }
+        tmpDB[i].videos = vid
+    }
+    //same for crypto
+    for(let i = 0; i < tmpDB.length; i++){
+        let cry = []
+        for(let j = 0; j < tmpDB[i].crypto.length; j++){
+            let tmp = tmpDB[i].crypto[j]
+            for(let k = 0; k < tmp.length; k++){
+                if(!cry.includes(tmp[k])){
+                    cry.push(tmp[k])
+                }
+            }
+        }
+        tmpDB[i].crypto = cry
+    }
+
+    db = tmpDB
+}
+
+async function getAllFileContent(path) {
+    let fileList = await exploreFileSimple(path)
+    let tmp = []
+    for(let i = 0; i < fileList.length; i++){
+        try{
+            tmp.push(JSON.parse(Deno.readTextFileSync(path+"/"+fileList[i])))
+        } catch(err){}
+    }
+    return tmp
+}
+
+async function exploreDirSimple(dir){
+    let tmp = []
+    for await (const dirEntry of Deno.readDir(dir)) {
+        if(dirEntry.isDirectory){
+            tmp.push(dirEntry.name)
+        }
+    }
+    return tmp
+}
+async function exploreFileSimple(dir){
+    let tmp = []
+    for await (const dirEntry of Deno.readDir(dir)) {
+        if(!dirEntry.isDirectory){
+            tmp.push(dirEntry.name)
+        }
+    }
+    return tmp
 }
 
 /*
@@ -71,7 +193,9 @@ async function main(request:any) {
 
             if(request.url == "/api/v1/indexer/status"){
                 response.body = {
-                    status: "online"
+                    status: "online",
+                    waitingLink: urlDatabase.length,
+                    domainInDB: domainDatabase.length
                 }
             } else if(request.url == "/push"){
                 // push new data
@@ -104,7 +228,7 @@ async function main(request:any) {
                     }
                 }
             } else if(request.url.startsWith('/search/')){
-                //todo
+                response = await search(request)
             } else {
                 response.status = 404
             }
@@ -122,6 +246,80 @@ async function main(request:any) {
     request.respond(response);
 }
 
+
+async function search(request:any) {
+    let response:Response = {}
+
+    let body = await betRequestBody(request)
+    body.title = body.title.toLowerCase()
+
+    if(request.url == '/search/title'){
+        //get link by title, soo where content.title contains the title
+        let tmp = []
+        for(let i = 0; i < db.length; i++){
+            for(let j = 0; j < db[i].content.length; j++){
+                if(db[i].content[j].title.toLowerCase().includes(body.title)){
+                    tmp.push(db[i].content[j])
+                }
+            }
+        }
+        response.body = tmp
+    } else if(request.url == '/search/content'){
+        //get link by title, soo where content.title contains the title
+        let tmp = []
+        for(let i = 0; i < db.length; i++){
+            for(let j = 0; j < db[i].content.length; j++){
+                for(let k = 0; k < db[i].content[j].paragraphs.length; k++){
+                    if(db[i].content[j].paragraphs[k].toLowerCase().includes(body.title)){
+                        tmp.push(db[i].content[j])
+                    }
+                }
+            }
+        }
+        response.body = tmp
+    } else if(request.url == '/search/images'){
+        //get image where alt, src, id, name contains the title
+        let tmp = []
+        for(let i = 0; i < db.length; i++){
+            for(let j = 0; j < db[i].images.length; j++){
+                if(db[i].images[j].alt.toLowerCase().includes(body.title) || db[i].images[j].id.toLowerCase().includes(body.title) || db[i].images[j].name.toLowerCase().includes(body.title)){
+                    tmp.push(db[i].images[j])
+                }
+            }
+        }
+        response.body = tmp
+    } else if(request.url == '/search/videos'){
+        //get image where alt, src, id, name contains the title
+        let tmp = []
+        for(let i = 0; i < db.length; i++){
+            for(let j = 0; j < db[i].videos.length; j++){
+                if(db[i].videos[j].alt.toLowerCase().includes(body.title) || db[i].videos[j].id.toLowerCase().includes(body.title) || db[i].videos[j].name.toLowerCase().includes(body.title)){
+                    tmp.push(db[i].videos[j])
+                }
+            }
+        }
+        response.body = tmp
+    } else if(request.url == '/search/email'){
+        //get image where alt, src, id, name contains the title
+        let tmp = []
+        for(let i = 0; i < db.length; i++){
+            for(let j = 0; j < db[i].email.length; j++){
+                if(db[i].email[j].toLowerCase().includes(body.title)){
+                    tmp.push(db[i].email[j])
+                }
+            }
+        }
+        response.body = tmp
+    } else {
+        response.body = []
+    }
+
+    let h = new Headers()
+    h.append('Content-Type', 'application/json')
+    response.headers = h
+
+    return response
+}
 
 async function betRequestBody(request) {
     try{
@@ -163,7 +361,8 @@ async function addNewUrl(data) {
             lastCheck: Date.now(),
             lastUpdate: Date.now(),
             title: [],
-            url: []
+            url: [],
+            email: []
         }
         crypto = []
     } else {
@@ -196,7 +395,8 @@ async function addNewUrl(data) {
         externalLinks: [],
         internalLinks: [],
         paragraphs: [],
-        meta: null
+        meta: null,
+        url: data.url
     }
     images = data.images
     videos = data.videos
@@ -219,25 +419,37 @@ async function addNewUrl(data) {
     }
 
     Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json", JSON.stringify(crypto))
-    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json", JSON.stringify(infos))
 
     //now add all the link to url database
     for(let i =0; i<data.content.internal_links.length; i++){
-        if(!urlDatabase.includes(data.content.internal_links[i]) && infos.url.find(x => x.url == data.content.internal_links[i]) == undefined){
+        if(!urlDatabase.includes(data.content.internal_links[i]) && infos.url.find(x => x.url == data.content.internal_links[i]) == undefined && !urlWaiting.includes(data.content.internal_links[i])){
             urlDatabase.push(data.content.internal_links[i])
         }
     }
     for(let i =0; i<data.content.external_links.length; i++){
-        if(!urlDatabase.includes(data.content.external_links[i])){
-            urlDatabase.push(data.content.external_links[i])
-        }
+        try{
+            if(data.content_external_links[i].endsWith('.png') || data.content_external_links[i].endsWith('.jpg') || data.content_external_links[i].endsWith('.jpeg') || data.content_external_links[i].endsWith('.gif') || data.content_external_links[i].endsWith('.svg')){
+                if(!orphenlanIMG.includes(data.content_external_links[i])){
+                    orphenlanIMG.push(data.content_external_links[i])
+                }
+            } else {
+                if(!urlDatabase.includes(data.content.external_links[i])){
+                    urlDatabase.push(data.content.external_links[i])
+                }
+            }
+        } catch(err){}
     }
 
+    //adding the email
+    for(let i =0; i<data.email.length; i++){
+        if(!infos.email.includes(data.email[i])){
+            infos.email.push(data.email[i])
+        }
+    }
+    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json", JSON.stringify(infos))
     //remove URL from waiting list
     urlWaiting.splice(urlWaiting.indexOf(data.url), 1)
-
-    console.log(urlDatabase.length)
-
+    console.log("Url in database: "+urlDatabase.length)
     response.body = "ok"
     return response
 }
@@ -251,8 +463,7 @@ function randomString(length) {
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * 
- charactersLength));
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
    }
    return result;
 }

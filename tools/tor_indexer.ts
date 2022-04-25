@@ -1,4 +1,5 @@
-import {Tor} from "https://deno.land/x/tor@0.0.3.2/mod.ts"
+//import { Tor } from "https://deno.land/x/tor@0.0.3.3/mod.ts"
+import { Tor } from "../../../tor/mod.ts"
 import { show } from '../utils/show.ts'
 import { utils } from '../utils/utils.ts'
 const _show = new show()
@@ -121,7 +122,7 @@ export class TorIndexer {
         await this.sendReport(repport, conf)
         _show.torindexerlog(`DONE : ${workingURL}`)
         //wait 5 sec
-        await new Promise(resolve => setTimeout(resolve, 5000))
+        await new Promise(resolve => setTimeout(resolve, 2000))
         await this.launch(conf)
     }
 
@@ -183,6 +184,7 @@ export class TorIndexer {
     }
 
     private async createPageRepport(content, url){
+        let domain = url.split("://")[1].split("/")[0]
         let base = {
             "url": url,
             "title": "",
@@ -201,6 +203,7 @@ export class TorIndexer {
             },
             "images": [],
             "videos": [],
+            "email": [],
             "cryptocurrencies": []
         }
         /**
@@ -228,242 +231,268 @@ export class TorIndexer {
 
 
         // Step 2: get the meta
-        if(content.includes("<meta name=\'description\'")){
-            base.meta.description = content.split("<meta name=\'description\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        } else if(content.includes("<meta name=\"description\"")){
-            base.meta.description = content.split("<meta name=\"description\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        }
-
-        if(content.includes("<meta name=\'keywords\'")){
-            base.meta.keywords = content.split("<meta name=\'keywords\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        } else if(content.includes("<meta name=\"keywords\"")){
-            base.meta.keywords = content.split("<meta name=\"keywords\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        }
-
-        if(content.includes("<meta name=\'author\'")){
-            base.meta.author = content.split("<meta name=\'author\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        } else if(content.includes("<meta name=\"author\"")){
-            base.meta.author = content.split("<meta name=\"author\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        }
-
-        if(content.includes("<meta name=\'robots\'")){
-            base.meta.robots = content.split("<meta name=\'robots\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        } else if(content.includes("<meta name=\"robots\"")){
-            base.meta.robots = content.split("<meta name=\"robots\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        }
-
-        if(content.includes("<meta name=\'referrer\'")){
-            base.meta.referrer = content.split("<meta name=\'referrer\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        } else if(content.includes("<meta name=\"referrer\"")){
-            base.meta.referrer = content.split("<meta name=\"referrer\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
-        }
-
-        // Step 3: get the content
-        if(content.includes("<p>")){
-            let paragraphs = content.split("<p>")
-            for(let i = 1; i < paragraphs.length; i++){
-                let paragraph = paragraphs[i].split("</p>")[0]
-                base.content.paragraphs.push(paragraph)
+        try{
+            if(content.includes("<meta name=\'description\'")){
+                base.meta.description = content.split("<meta name=\'description\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
+            } else if(content.includes("<meta name=\"description\"")){
+                base.meta.description = content.split("<meta name=\"description\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
             }
-        }
-
-        // Step 3.2: get the title
-        if(content.includes("<h1>")){
-            let titles = content.split("<h1>")
-            for(let i = 1; i < titles.length; i++){
-                let title = titles[i].split("</h1>")[0]
-                base.content.title.push(title)
+    
+            if(content.includes("<meta name=\'keywords\'")){
+                base.meta.keywords = content.split("<meta name=\'keywords\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
+            } else if(content.includes("<meta name=\"keywords\"")){
+                base.meta.keywords = content.split("<meta name=\"keywords\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
             }
-        }
-        if(content.includes("<h2>")){
-            let titles = content.split("<h2>")
-            for(let i = 1; i < titles.length; i++){
-                let title = titles[i].split("</h2>")[0]
-                base.content.title.push(title)
+    
+            if(content.includes("<meta name=\'author\'")){
+                base.meta.author = content.split("<meta name=\'author\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
+            } else if(content.includes("<meta name=\"author\"")){
+                base.meta.author = content.split("<meta name=\"author\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
             }
-        }
-        if(content.includes("<h3>")){
-            let titles = content.split("<h3>")
-            for(let i = 1; i < titles.length; i++){
-                let title = titles[i].split("</h3>")[0]
-                base.content.title.push(title)
+    
+            if(content.includes("<meta name=\'robots\'")){
+                base.meta.robots = content.split("<meta name=\'robots\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
+            } else if(content.includes("<meta name=\"robots\"")){
+                base.meta.robots = content.split("<meta name=\"robots\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
             }
-        }
-        if(content.includes("<h4>")){
-            let titles = content.split("<h4>")
-            for(let i = 1; i < titles.length; i++){
-                let title = titles[i].split("</h4>")[0]
-                base.content.title.push(title)
+    
+            if(content.includes("<meta name=\'referrer\'")){
+                base.meta.referrer = content.split("<meta name=\'referrer\'")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
+            } else if(content.includes("<meta name=\"referrer\"")){
+                base.meta.referrer = content.split("<meta name=\"referrer\"")[1].split("content=")[1].replace('/>', ">").split(">")[0].replace(/\"/g, "").replace(/\'/g, "")
             }
-        }
-        if(content.includes("<h5>")){
-            let titles = content.split("<h5>")
-            for(let i = 1; i < titles.length; i++){
-                let title = titles[i].split("</h5>")[0]
-                base.content.title.push(title)
-            }
-        }
-        if(content.includes("<h6>")){
-            let titles = content.split("<h6>")
-            for(let i = 1; i < titles.length; i++){
-                let title = titles[i].split("</h6>")[0]
-                base.content.title.push(title)
-            }
-        }
-
-        // Step 3.3: get the internal links ./ / or URL/
-        if(content.includes("href=")){
-            let links = content.split("href=")
-            for(let i = 1; i < links.length; i++){
-                let link = links[i].split("\"")[1]
-                if(link.includes(url)){
-                    base.content.internal_links.push(link)
-                } else if(link.startsWith("/")){
-                    base.content.internal_links.push(base.url + link.replace('/', ''))
-                } else if(link.startsWith("./")){
-                    base.content.internal_links.push(base.url + link.replace("./", ""))
-                } else if(link.includes("../")){
-                    let url = base.url.split("/")
-                    url.pop()
-                    url.pop()
-                    url.push(link.replace("../", ""))
-                    base.content.internal_links.push(url.join("/"))
-                }
-            }
-        }
-        // we need to filter the link and remove the duplicates
-        let tmp = []
-        for(let i = 0; i < base.content.internal_links.length; i++){
-            if(!tmp.includes(base.content.internal_links[i].split('\n')[0])){
-                tmp.push(base.content.internal_links[i].split('\n')[0])
-            }
-        }
-        base.content.internal_links = tmp
-        // we need to remove .css .js .ttf .ico links
-        base.content.internal_links = base.content.internal_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico"))
-
-        // Step 3.4: get the external links
-        if(content.includes("href=")){
-            let links = content.split("href=")
-            for(let i = 1; i < links.length; i++){
-                let link = links[i].split("\"")[1]
-                if(link.startsWith("http") && !link.includes(base.url)){
-                    base.content.external_links.push(link)
-                }
-            }
-        }
-        // we need to filter the link and remove the duplicates
-        tmp = []
-        for(let i = 0; i < base.content.external_links.length; i++){
-            if(!tmp.includes(base.content.external_links[i].split('\n')[0])){
-                tmp.push(base.content.external_links[i].split('\n')[0])
-            }
-        }
-        base.content.external_links = tmp
-        // we need to remove .css .js .ttf .ico links
-        base.content.external_links = base.content.external_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico"))
-        // only keep .onion links
-        base.content.external_links = base.content.external_links.filter((v) => v.includes(".onion"))
-
-        // Step 4: get the images .jpg .png .gif .jpeg .webp
-        if(content.includes("src=")){
-            let images = content.split("src=")
-            for(let i = 1; i < images.length; i++){
-                let image = images[i].split("\"")[1]
-                if(image.includes(".jpg") || image.includes(".png") || image.includes(".gif") || image.includes(".jpeg") || image.includes(".webp")){
-
-                    let imageData = content.split("src=")[i].split(">")[0]
-
-                    //get the alt text, the id and the name
-                    let alt = ""
-                    let id = ""
-                    let name = ""
-                    if(imageData.includes("alt=")){
-                        let alts = imageData.split("alt=")
-                        if(alts[1].includes("\"")){
-                            alt = alts[1].split("\"")[1]
-                        } else {
-                            alt = alts[1]
-                        }
-                    }
-                    if(imageData.includes("id=")){
-                        let ids = imageData.split("id=")
-                        if(ids[1].includes("\"")){
-                            id = ids[1].split("\"")[1]
-                        } else {
-                            id = ids[1]
-                        }
-                    }
-                    if(imageData.includes("name=")){
-                        let names = imageData.split("id=")
-                        if(names[1].includes("\"")){
-                            name = names[1].split("\"")[1]
-                        } else {
-                            name = names[1]
-                        }
-                    }
-
-                    base.images.push({
-                        "url": url+image.replace('/', ''),
-                        "alt": alt,
-                        "id": id,
-                        "name": name,
-                        "type": image.split(".")[image.split(".").length - 1]
-                    })
-                }
-            }
-        }
+        } catch(err){}
         
 
-        // Step 5: get the videos (same code that image) .mp4 .webm .ogg .ogv .avi .mov .wmv .flv .mkv
-        if(content.includes("src=")){
-            let videos = content.split("src=")
-            for(let i = 1; i < videos.length; i++){
-                let video = videos[i].split("\"")[1]
-                if(video.includes(".mp4") || video.includes(".webm") || video.includes(".ogg") || video.includes(".ogv") || video.includes(".avi") || video.includes(".mov") || video.includes(".wmv") || video.includes(".flv") || video.includes(".mkv")){
-
-                    let videoData = content.split("src=")[i].split(">")[0]
-
-                    //get the alt text, the id and the name
-                    let alt = ""
-                    let id = ""
-                    let name = ""
-                    if(videoData.includes("alt=")){
-                        let alts = videoData.split("alt=")
-                        if(alts[1].includes("\"")){
-                            alt = alts[1].split("\"")[1]
-                        } else {
-                            alt = alts[1]
-                        }
-                    }
-                    if(videoData.includes("id=")){
-                        let ids = videoData.split("id=")
-                        if(ids[1].includes("\"")){
-                            id = ids[1].split("\"")[1]
-                        } else {
-                            id = ids[1]
-                        }
-                    }
-                    if(videoData.includes("name=")){
-                        let names = videoData.split("id=")
-                        if(names[1].includes("\"")){
-                            name = names[1].split("\"")[1]
-                        } else {
-                            name = names[1]
-                        }
-                    }
-
-                    base.videos.push({
-                        "url": url+video.replace('/', ''),
-                        "alt": alt,
-                        "id": id,
-                        "name": name,
-                        "type": video.split(".")[video.split(".").length - 1]
-                    })
+        // Step 3: get the content
+        try{
+            if(content.includes("<p>")){
+                let paragraphs = content.split("<p>")
+                for(let i = 1; i < paragraphs.length; i++){
+                    let paragraph = paragraphs[i].split("</p>")[0]
+                    base.content.paragraphs.push(paragraph)
                 }
             }
-        }     
+        } catch(err){}
+        
 
+        // Step 3.2: get the title
+        try{
+            if(content.includes("<h1>")){
+                let titles = content.split("<h1>")
+                for(let i = 1; i < titles.length; i++){
+                    let title = titles[i].split("</h1>")[0]
+                    base.content.title.push(title)
+                }
+            }
+            if(content.includes("<h2>")){
+                let titles = content.split("<h2>")
+                for(let i = 1; i < titles.length; i++){
+                    let title = titles[i].split("</h2>")[0]
+                    base.content.title.push(title)
+                }
+            }
+            if(content.includes("<h3>")){
+                let titles = content.split("<h3>")
+                for(let i = 1; i < titles.length; i++){
+                    let title = titles[i].split("</h3>")[0]
+                    base.content.title.push(title)
+                }
+            }
+            if(content.includes("<h4>")){
+                let titles = content.split("<h4>")
+                for(let i = 1; i < titles.length; i++){
+                    let title = titles[i].split("</h4>")[0]
+                    base.content.title.push(title)
+                }
+            }
+            if(content.includes("<h5>")){
+                let titles = content.split("<h5>")
+                for(let i = 1; i < titles.length; i++){
+                    let title = titles[i].split("</h5>")[0]
+                    base.content.title.push(title)
+                }
+            }
+            if(content.includes("<h6>")){
+                let titles = content.split("<h6>")
+                for(let i = 1; i < titles.length; i++){
+                    let title = titles[i].split("</h6>")[0]
+                    base.content.title.push(title)
+                }
+            }
+        } catch(err){}
+        
+
+        // Step 3.3: get the internal links ./ / or URL/
+        try{
+            if(content.includes("href=")){
+                let links = content.split("href=")
+                for(let i = 1; i < links.length; i++){
+                    let link = links[i].split("\"")[1]
+                    if(link.startsWith('#')){
+                        //NOTHING LOL
+                    } else if(link.includes(domain)){
+                        base.content.internal_links.push(link)
+                    } else if(link.startsWith("//")){
+                        //link = link.replace("//", "http://")
+                        if(link.split('//')[1].includes(domain)){
+                            base.content.internal_links.push("http:"+link)
+                        } else {
+                            if(link.split('//')[1].split('/')[0].includes(".onion")){
+                                base.content.external_links.push("http:"+link)
+                            } 
+                        }
+                    } else if(link.startsWith("/")){
+                        base.content.internal_links.push("http://"+domain + link)
+                    } else if(link.startsWith("./")){
+                        base.content.internal_links.push("http://"+domain + link.replace("./", "/"))
+                    } else if(link.includes("../")){
+                        let url = base.url.split("/")
+                        url.pop()
+                        url.pop()
+                        url.push(link.replace("../", ""))
+                        base.content.internal_links.push(url.join("/"))
+                    }
+                }
+            }
+            // we need to filter the link and remove the duplicates
+            let tmp = []
+            for(let i = 0; i < base.content.internal_links.length; i++){
+                if(!tmp.includes(base.content.internal_links[i].split('\n')[0])){
+                    tmp.push(base.content.internal_links[i].split('\n')[0])
+                }
+            }
+            base.content.internal_links = tmp
+            // we need to remove .css .js .ttf .ico links
+            base.content.internal_links = base.content.internal_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico"))
+    
+            // Step 3.4: get the external links
+            if(content.includes("href=")){
+                let links = content.split("href=")
+                for(let i = 1; i < links.length; i++){
+                    let link = links[i].split("\"")[1]
+                    if(link.startsWith("http") && !link.includes(base.url)){
+                        base.content.external_links.push(link)
+                    }
+                }
+            }
+            // we need to filter the link and remove the duplicates
+            tmp = []
+            for(let i = 0; i < base.content.external_links.length; i++){
+                if(!tmp.includes(base.content.external_links[i].split('\n')[0])){
+                    tmp.push(base.content.external_links[i].split('\n')[0])
+                }
+            }
+            base.content.external_links = tmp
+            // we need to remove .css .js .ttf .ico links
+            base.content.external_links = base.content.external_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico"))
+            // only keep .onion links
+            base.content.external_links = base.content.external_links.filter((v) => v.includes(".onion"))
+    
+        } catch(err){}
+        
+        // Step 4: get the images .jpg .png .gif .jpeg .webp
+        try{
+            if(content.includes("src=")){
+                let images = content.split("src=")
+                for(let i = 1; i < images.length; i++){
+                    let image = images[i].split("\"")[1]
+                    if(image.includes(".jpg") || image.includes(".png") || image.includes(".gif") || image.includes(".jpeg") || image.includes(".webp")){
+    
+                        let imageData = content.split("src=")[i].split(">")[0]
+    
+                        //get the alt text, the id and the name
+                        let alt = ""
+                        let id = ""
+                        let name = ""
+                        if(imageData.includes("alt=")){
+                            let alts = imageData.split("alt=")
+                            if(alts[1].includes("\"")){
+                                alt = alts[1].split("\"")[1]
+                            } else {
+                                alt = alts[1]
+                            }
+                        }
+                        if(imageData.includes("id=")){
+                            let ids = imageData.split("id=")
+                            if(ids[1].includes("\"")){
+                                id = ids[1].split("\"")[1]
+                            } else {
+                                id = ids[1]
+                            }
+                        }
+                        if(imageData.includes("name=")){
+                            let names = imageData.split("id=")
+                            if(names[1].includes("\"")){
+                                name = names[1].split("\"")[1]
+                            } else {
+                                name = names[1]
+                            }
+                        }
+    
+                        base.images.push({
+                            "url": url+image.replace('/', ''),
+                            "alt": alt,
+                            "id": id,
+                            "name": name,
+                            "type": image.split(".")[image.split(".").length - 1]
+                        })
+                    }
+                }
+            }
+        } catch(err){}
+        
+        // Step 5: get the videos (same code that image) .mp4 .webm .ogg .ogv .avi .mov .wmv .flv .mkv
+        try{
+            if(content.includes("src=")){
+                let videos = content.split("src=")
+                for(let i = 1; i < videos.length; i++){
+                    let video = videos[i].split("\"")[1]
+                    if(video.includes(".mp4") || video.includes(".webm") || video.includes(".ogg") || video.includes(".ogv") || video.includes(".avi") || video.includes(".mov") || video.includes(".wmv") || video.includes(".flv") || video.includes(".mkv")){
+    
+                        let videoData = content.split("src=")[i].split(">")[0]
+    
+                        //get the alt text, the id and the name
+                        let alt = ""
+                        let id = ""
+                        let name = ""
+                        if(videoData.includes("alt=")){
+                            let alts = videoData.split("alt=")
+                            if(alts[1].includes("\"")){
+                                alt = alts[1].split("\"")[1]
+                            } else {
+                                alt = alts[1]
+                            }
+                        }
+                        if(videoData.includes("id=")){
+                            let ids = videoData.split("id=")
+                            if(ids[1].includes("\"")){
+                                id = ids[1].split("\"")[1]
+                            } else {
+                                id = ids[1]
+                            }
+                        }
+                        if(videoData.includes("name=")){
+                            let names = videoData.split("id=")
+                            if(names[1].includes("\"")){
+                                name = names[1].split("\"")[1]
+                            } else {
+                                name = names[1]
+                            }
+                        }
+    
+                        base.videos.push({
+                            "url": url+video.replace('/', ''),
+                            "alt": alt,
+                            "id": id,
+                            "name": name,
+                            "type": video.split(".")[video.split(".").length - 1]
+                        })
+                    }
+                }
+            }  
+        } catch(err){}
+           
         // Step 6: get all crypto currencies wallet
         // Step 6.1: get the bitcoin wallet based on ^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$
         try{
@@ -630,15 +659,24 @@ export class TorIndexer {
         } catch(err){}
         
 
+        // same for email based on ^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$
+        try{
+            let email = content.match(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*/g)
+            for(let i = 0; i < email.length; i++){
+                base.email.push(email[i])
+            }
+        } catch(err){}
+
         //create an entry parser for bautiful json
-        for(let i = 0; i < base.content.paragraphs.length; i++){
-            base.content.paragraphs[i] = this.cleanString(base.content.paragraphs[i])
-        }
-        for(let i = 0; i < base.content.title.length; i++){
-            base.content.title[i] = this.cleanString(base.content.title[i])
-        }
-        base.title = this.cleanString(base.title)
-        
+        try{
+            for(let i = 0; i < base.content.paragraphs.length; i++){
+                base.content.paragraphs[i] = this.cleanString(base.content.paragraphs[i])
+            }
+            for(let i = 0; i < base.content.title.length; i++){
+                base.content.title[i] = this.cleanString(base.content.title[i])
+            }
+            base.title = this.cleanString(base.title)
+        } catch(err){}
 
         //Done with the page, check JSON
         return base
