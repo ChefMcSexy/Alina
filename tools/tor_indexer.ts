@@ -1,5 +1,5 @@
-//import { Tor } from "https://deno.land/x/tor@0.0.3.3/mod.ts"
-import { Tor } from "../../../tor/mod.ts"
+import { Tor } from "https://deno.land/x/tor@0.0.3.9/mod.ts"
+//import { Tor } from "../../../tor/mod.ts"
 import { show } from '../utils/show.ts'
 import { utils } from '../utils/utils.ts'
 const _show = new show()
@@ -74,9 +74,33 @@ export class TorIndexer {
         Deno.writeTextFileSync('./db/indexer.json', JSON.stringify(data))
 
         _show.log('Configuration is saved / launching the indexer')
-        await this.launch(data)
+        let threadCount = await this.selectThread()
+
+        for(let i = 0; i < threadCount-1; i++){
+            this.launch(data, i)
+        }
+        await this.launch(data, threadCount-1)
     }
 
+
+    private async selectThread(){
+        let thread = await _utils.listenUserResponse(_show.input("Enter the thread you want (empty = 1)"))
+        if(thread == ""){
+            return 1
+        } else {
+            try{
+                let threadCount = parseInt(thread)
+                if(threadCount > 0){
+                    return threadCount
+                } else {
+                    return await this.selectThread()
+                }
+            } catch(err){
+                _show.error("Please enter a valid thread number")
+                return await this.selectThread()
+            }
+        }
+    }
 
     private async askUserConf(){
         //need hostname, port, headers_key
@@ -106,7 +130,7 @@ export class TorIndexer {
     
     //todo: thread
     
-    private async launch(conf){
+    private async launch(conf, thread){
         /*
             The indexer client do: 
             1. contact the server for link to scrawl
@@ -116,14 +140,14 @@ export class TorIndexer {
             5. go to 1.
         */
         let workingURL = await this.getWork(conf, true)
-        _show.torindexerlog(`Starting : ${workingURL}`)
+        _show.torindexerlog(`${thread} : Starting : ${workingURL}`)
         let pageContent = await this.getTorPage(workingURL)
         let repport = await this.createPageRepport(pageContent, workingURL)
         await this.sendReport(repport, conf)
-        _show.torindexerlog(`DONE : ${workingURL}`)
+        _show.torindexerlog(`${thread} : DONE : ${workingURL}`)
         //wait 5 sec
         await new Promise(resolve => setTimeout(resolve, 2000))
-        await this.launch(conf)
+        await this.launch(conf, thread)
     }
 
     private async sendReport(report, conf){
