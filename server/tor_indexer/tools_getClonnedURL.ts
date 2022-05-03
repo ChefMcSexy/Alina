@@ -1,5 +1,3 @@
-
-
 let letter = await exploreDirSimple('./db/bin/')
 let domain = []
 for(let i = 0; i < letter.length; i++){

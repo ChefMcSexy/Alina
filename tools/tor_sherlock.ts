@@ -23,6 +23,7 @@ export class TorSherlock {
 
     async main(){
         _me.showMenu()
+        console.log("This part is currently under construction, please wait for the next update.")
         let choice = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
 
         if (choice == "1") {

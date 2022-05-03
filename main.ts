@@ -25,11 +25,8 @@ async function main() {
     } else {
         console.clear()
         console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
-        main()
     }
-
     main()
 }
-
 
 main()
