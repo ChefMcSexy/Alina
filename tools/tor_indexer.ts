@@ -167,6 +167,7 @@ export class TorIndexer {
             })
         } catch(err){
             console.log(err)
+            await new Promise(resolve => setTimeout(resolve, 30000))
         }
     }
 
@@ -208,7 +209,14 @@ export class TorIndexer {
     }
 
     private async createPageRepport(content, url){
-        let domain = url.split("://")[1].split("/")[0]
+        let domain
+        try{
+            domain = url.split("://")[1].split("/")[0]
+        } catch(err) {
+            return null
+        }
+    
+        
         let base = {
             "url": url,
             "title": "",
@@ -290,10 +298,10 @@ export class TorIndexer {
 
         // Step 3: get the content
         try{
-            if(content.includes("<p>")){
-                let paragraphs = content.split("<p>")
+            if(content.includes("<p")){
+                let paragraphs = content.split("<p")
                 for(let i = 1; i < paragraphs.length; i++){
-                    let paragraph = paragraphs[i].split("</p>")[0]
+                    let paragraph = paragraphs[i].split(">")[1].split("</p")[0]
                     base.content.paragraphs.push(paragraph)
                 }
             }
@@ -388,7 +396,7 @@ export class TorIndexer {
             }
             base.content.internal_links = tmp
             // we need to remove .css .js .ttf .ico links
-            base.content.internal_links = base.content.internal_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico"))
+            base.content.internal_links = base.content.internal_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico") && !v.includes(".png") && !v.includes(".jpg") && !v.includes(".ico") && !v.includes(".webp"))
     
             // Step 3.4: get the external links
             if(content.includes("href=")){
@@ -409,7 +417,7 @@ export class TorIndexer {
             }
             base.content.external_links = tmp
             // we need to remove .css .js .ttf .ico links
-            base.content.external_links = base.content.external_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico"))
+            base.content.external_links = base.content.external_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico") && !v.includes(".png") && !v.includes(".jpg") && !v.includes(".ico") && !v.includes(".webp"))
             // only keep .onion links
             base.content.external_links = base.content.external_links.filter((v) => v.includes(".onion"))
     

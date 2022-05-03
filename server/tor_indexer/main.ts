@@ -9,7 +9,7 @@ let urlDatabase = [] // little bit more complex, a list of urls
 let urlWaiting = []
 let orphenlanIMG = []
 let sameURL = []
-let db
+let db = []
 
 try{
     domainDatabase = JSON.parse(Deno.readTextFileSync("./db/domains.json"))
@@ -60,7 +60,7 @@ async function loadAllTheData(){
 //data loader
 setInterval(() => {
     loadDatabase()
-}, 23*60000)
+}, 12*60*60000)
 
 loadDatabase()
 async function loadDatabase() {
@@ -75,18 +75,20 @@ async function loadDatabase() {
         for(let j = 0; j < letterDir.length; j++){
             try{
                 let domain = letterDir[j]
+                console.log(domain)
                 tmpDomainList.push("./db/data/"+domain.split('')[0]+"/"+domain)
                 let dinfo = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json"))
                 tmpDB.push({
                     domain: domain,
-                    crypto: JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json")),
+                    crypto: [],//JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json")),
                     url: dinfo.url,
                     content: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/content"),
-                    images: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/images"),
-                    videos: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/videos"),
+                    images: [],//await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/images"),
+                    videos: [],//await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/videos"),
                     email: dinfo.email
                 })
-            } catch(err){}
+            } catch(err){
+            }
         }
     }
     
@@ -145,24 +147,60 @@ async function loadDatabase() {
                     //get all the page with the same title
                     let sameTitle = await db_searchViaTitle(tmpDB[i].content[j].title,tmpDB)
                     //OKAY so now we check if the paragraph are the same
-                    for(let k = 0; k < sameTitle.length; k++){
-                        if(sameTitle[k].paragraphs.length != 0){
-                            if(sameTitle[k].paragraphs.length == tmpDB[i].content[j].paragraphs.length){
-                                //console.log("Innnnnnnn")
-                                let same = true
-                                for(let l = 0; l < sameTitle[k].paragraphs.length; l++){
-                                    //console.log(sameTitle[k].paragraphs[l])
-                                    //console.log(tmpDB[i].content[j].paragraphs[l])
-                                    if(sameTitle[k].paragraphs[l] != tmpDB[i].content[j].paragraphs[l]){
-                                        same = false
-                                    }
-                                }
-                                if(same){
-                                    if(tmpDB[i].content[j].url != sameTitle[k].url){
-                                        sameArray.push({
-                                            urlIn: tmpDB[i].content[j].url,
-                                            urlOut: sameTitle[k].url
-                                        })
+
+                    if(tmpDB[i].content[j] != undefined){
+                        for(let k = 0; k < sameTitle.length; k++){
+
+                            if(sameTitle[k].bypass){
+                                console.log("[+] Bypassing "+sameTitle[k].url + " because it's same that "+tmpDB[i].content[j].url)
+                            } else {
+                                if(sameTitle[k].paragraphs.length != 0){
+                                    if(sameTitle[k].paragraphs.length == tmpDB[i].content[j].paragraphs.length){
+                                        //console.log("Innnnnnnn")
+                                        let same = true
+                                        for(let l = 0; l < sameTitle[k].paragraphs.length; l++){
+                                            //console.log(sameTitle[k].paragraphs[l])
+                                            //console.log(tmpDB[i].content[j].paragraphs[l])
+                                            if(sameTitle[k].paragraphs[l] != tmpDB[i].content[j].paragraphs[l]){
+                                                same = false
+                                            }
+                                        }
+                                        if(same){
+                                            try{
+                                                sameTitle[k].domain = sameTitle[k].url.split('://')[1].split('.onion')[0]+".onion"
+                                                // I need to move the file content in the ./db/bin/
+                                                let dir = "./db/bin/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain+"/"
+                                                Deno.mkdirSync("./db/bin/"+sameTitle[k].domain.split('')[0], { recursive: true })
+            
+                                                //move the dir
+                                                let p = await Deno.run({
+                                                    cmd: ["mv", "./db/data/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain, dir],
+                                                    stdout: "piped",
+                                                    stderr: "piped"
+                                                })
+                                                await p.status()
+            
+                                                Deno.writeTextFileSync(dir+"multiple", tmpDB[i].content[j].url)
+    
+                                                let newURLDATABASE = []
+                                                for(let e = 0; e < urlDatabase.length; e++){
+                                                    if(!urlDatabase[e].startsWith(sameTitle[k].url)){
+                                                        newURLDATABASE.push(urlDatabase[e])
+                                                    }
+                                                }
+                                                urlDatabase = newURLDATABASE
+            
+                                                //remove tmpDB[i].domain form tmpDB
+                                                sameTitle[k].bypass = true
+                                                /*
+                                                if(tmpDB[i].content[j].url != sameTitle[k].url){
+                                                    sameArray.push({
+                                                        urlIn: tmpDB[i].content[j].url,
+                                                        urlOut: sameTitle[k].url
+                                                    })
+                                                }*/
+                                            } catch(err){}
+                                        }
                                     }
                                 }
                             }
@@ -172,9 +210,11 @@ async function loadDatabase() {
             }
         }
     }
-    console.log("[+] Same site: "+sameArray.length)
+    tmpDB = tmpDB.filter(x => !x.bypass)
+    console.log("[+] Same site is now clean")
     sameURL = sameArray
     db = tmpDB
+    console.log(`Got ${db.length} url`)
 
     //generateStatistic()
 }
@@ -333,7 +373,6 @@ async function db_searchViaTitle(title, workdb?) {
                 tmp2.push(tmp[i])
             }
         }
-
         tmp = tmp2
     }
 
