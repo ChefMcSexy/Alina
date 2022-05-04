@@ -11,8 +11,9 @@ let text_welcome = ink.colorize(`
                   <yellow>~ ./report.sh</yellow>         on mirror: <i>Tor</i> 🧄`)
 
 let text_menu = ink.colorize(`
-[<yellow>1</yellow>] - <blue>Tor indexer</blue>
-[<yellow>2</yellow>] - <blue>Tor sherlock</blue>
+[<yellow>1</yellow>] - <blue>Tor indexer (beta)</blue>
+[<yellow>2</yellow>] - <blue>Tor sherlock (soon)</blue>
+[<yellow>3</yellow>] - <blue>Web exploit</blue>
 [<yellow>@</yellow>] - <blue>Exit</blue>`)
 
 
@@ -21,6 +22,12 @@ let text_disclaimer = ink.colorize(`
 <blue>Alina</blue> is a <red>safety network</red> for the <blue>Tor</blue> network.
 The Tor🧄 indexer can index extremely large amount of data and this data can be illegal 🔞
 `)
+
+let web_exploit_menu = ink.colorize(`
+[<yellow>1</yellow>] - <blue>Find subdomain</blue>
+[<yellow>@</yellow>] - <blue>Exit</blue>`)
+
+
 
 export class show {
     public showWelcome() {
@@ -35,7 +42,9 @@ export class show {
     public showMenu() {
         console.log(text_menu)
     }
-
+    public show_web_exploit_menu() {
+        console.log(web_exploit_menu)
+    }
 
     public showTorDisclamer(){
         console.log(text_disclaimer)

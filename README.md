@@ -10,6 +10,9 @@ Obviously, the tools made available by this tool can be useful in other contexts
 
 ***📍 This project is for educational purposes only***
 
+<details>
+<summary>Read the disclamer 😁</summary>
+
 ## In case the script is used for its related functionality with an agreement:
 - Legal: `YES`
 - Not responsible for damage caused by the software: 
@@ -65,7 +68,9 @@ Obviously, the tools made available by this tool can be useful in other contexts
 ## Conclusion
 I think you got the message. Otherwise, just don't
 
-# Prerequisites
+</details>
+
+# Prerequisites 🐙
 ## Recommendations
 - Know Linux and how it works
 - Use of offshore server
@@ -78,18 +83,8 @@ I think you got the message. Otherwise, just don't
 If you are not able to install me in the tutorial even with the help scripts included, this script is not for you
 
 # Fonctionnalities
-- **Tor sherlock**
-  - try to detect if a ip is hidding domain hosting (clear & tor)
-  - make some Tor stats generation (TODO)
-- **Tor indexer**
-  - Scrawl Tor network [Tuto here](https://github.com/Sn0wAlice/Alina/wiki/Tor-Indexer)
-  - Act like a local Tor proxy (todo)
-
-<br>
-... SOON ...
+The script explaination is available [here](https://github.com/Sn0wAlice/Alina/wiki/) 🐰
 
 # Contributors
 - [Alice Snow](https://github.com/Sn0wAlice)
 - [Hecatonchire](https://github.com/hecarch)
-
-
