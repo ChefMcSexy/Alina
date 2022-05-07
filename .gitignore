@@ -1,2 +1,5 @@
 db/
 server/tor_indexer/db
+server/tor_indexer/backup
+
+!server/tor_indexer/db/data/*.md

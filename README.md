@@ -82,7 +82,7 @@ I think you got the message. Otherwise, just don't
 If you are not able to install me in the tutorial even with the help scripts included, this script is not for you
 
 # Functionalities
-The script explaination is available [here](https://github.com/Sn0wAlice/Alina/wiki/) 🐰
+The script explanation is available [here](https://github.com/Sn0wAlice/Alina/wiki/) 🐰
 
 # Contributors
 - [Alice Snow](https://github.com/Sn0wAlice)

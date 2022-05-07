@@ -1,4 +1,9 @@
 import { serve, Response } from "https://deno.land/std@0.104.0/http/server.ts";
+import { loadDatabase } from "./plugs/databaseLoader.ts"
+
+import { search } from "./plugs/search.ts";
+const _search = new search();
+
 
 const config = JSON.parse(Deno.readTextFileSync("./config.json"))
 const server = serve({hostname: config.hostname, port: config.port });
@@ -10,24 +15,15 @@ let urlWaiting = []
 let orphenlanIMG = []
 let sameURL = []
 let db = []
+Deno.mkdirSync("./db/data/", { recursive: true })
 
-try{
-    domainDatabase = JSON.parse(Deno.readTextFileSync("./db/domains.json"))
-} catch(err){}
-try{
-    orphenlanIMG = JSON.parse(Deno.readTextFileSync("./db/orphenlanIMG.json"))
-} catch(err){}
-try{
-    sameURL = JSON.parse(Deno.readTextFileSync("./db/sameURL.json"))
-} catch(err){}
-try {
-    urlDatabase = JSON.parse(Deno.readTextFileSync("./db/urls.json"))
-} catch(err){
-    urlDatabase = ["http://juhanurmihxlp77nkq76byazcldy2hlmovfu2epvl5ankdibsot4csyd.onion/"]
-}
+try{ domainDatabase = JSON.parse(Deno.readTextFileSync("./db/domains.json")) } catch(err){}
+try{ orphenlanIMG = JSON.parse(Deno.readTextFileSync("./db/orphenlanIMG.json")) } catch(err){}
+try{ sameURL = JSON.parse(Deno.readTextFileSync("./db/sameURL.json")) } catch(err){}
+try{ urlDatabase = JSON.parse(Deno.readTextFileSync("./db/urls.json")) } catch(err){}
 try{
     if(urlDatabase == [] || urlDatabase == null || urlDatabase.length == 0){
-        urlDatabase = ["http://juhanurmihxlp77nkq76byazcldy2hlmovfu2epvl5ankdibsot4csyd.onion/"]
+        urlDatabase = ["http://livehackzyr2wwos2ca3ygfan3ngvqytpe5ph74pdko55ohv6lgdshyd.onion/"]
     }
 } catch(err){}
 
@@ -59,195 +55,15 @@ async function loadAllTheData(){
 
 //data loader
 setInterval(() => {
-    loadDatabase()
+    getDatabase()
 }, 12*60*60000)
 
-loadDatabase()
-async function loadDatabase() {
-    //we need to get all the data from the database
-    console.log("[+] Database Start loaded at "+new Date().toLocaleString())
-    let letterDispo = await exploreDirSimple('./db/data/')
-    let tmpDomainList = []
-    let tmpDB = []
-    for(let i = 0; i < letterDispo.length; i++){
-        let letter = letterDispo[i]
-        let letterDir = await exploreDirSimple('./db/data/'+letter+"/")
-        for(let j = 0; j < letterDir.length; j++){
-            try{
-                let domain = letterDir[j]
-                console.log(domain)
-                tmpDomainList.push("./db/data/"+domain.split('')[0]+"/"+domain)
-                let dinfo = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json"))
-                tmpDB.push({
-                    domain: domain,
-                    crypto: [],//JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json")),
-                    url: dinfo.url,
-                    content: await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/content"),
-                    images: [],//await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/images"),
-                    videos: [],//await getAllFileContent("./db/data/"+domain.split('')[0]+"/"+domain+"/videos"),
-                    email: dinfo.email
-                })
-            } catch(err){
-            }
-        }
-    }
-    
-    //cool but we need to remove the data dupluction in images/videos/crypto
-    for(let i = 0; i < tmpDB.length; i++){
-        let img = []
-        for(let j = 0; j < tmpDB[i].images.length; j++){
-            let tmp = tmpDB[i].images[j]
-            //console.log(tmp)
-            for(let k = 0; k < tmp.length; k++){
-                if(!img.includes(tmp[k])){
-                    img.push(tmp[k])
-                }
-            }
-        }
-        tmpDB[i].images = img
-    }
-    //same for videos
-    for(let i = 0; i < tmpDB.length; i++){
-        let vid = []
-        for(let j = 0; j < tmpDB[i].videos.length; j++){
-            let tmp = tmpDB[i].videos[j]
-            for(let k = 0; k < tmp.length; k++){
-                if(!vid.includes(tmp[k])){
-                    vid.push(tmp[k])
-                }
-            }
-        }
-        tmpDB[i].videos = vid
-    }
-    //same for crypto
-    for(let i = 0; i < tmpDB.length; i++){
-        let cry = []
-        for(let j = 0; j < tmpDB[i].crypto.length; j++){
-            let tmp = tmpDB[i].crypto[j]
-            for(let k = 0; k < tmp.length; k++){
-                if(!cry.includes(tmp[k])){
-                    cry.push(tmp[k])
-                }
-            }
-        }
-        tmpDB[i].crypto = cry
-    }
-
-    //console.log(tmpDB)
-    console.log("[+] Database END loaded at "+new Date().toLocaleString())
-    console.log("[+] Database size: "+tmpDB.length)
-    console.log("[+] Fetching multiples urls")
-    let sameArray = []
-    //we need to detect the URL duplications
-    for(let i = 0; i < tmpDB.length; i++){
-        for(let j = 0; j < tmpDB[i].content.length; j++){
-            if(tmpDB[i].content[j].title.toLowerCase().includes("")){
-                //console.log('got '+tmpDB[i].content[j].title)
-                if(tmpDB[i].content[j].title.length > 0){
-                    //get all the page with the same title
-                    let sameTitle = await db_searchViaTitle(tmpDB[i].content[j].title,tmpDB)
-                    //OKAY so now we check if the paragraph are the same
-
-                    if(tmpDB[i].content[j] != undefined){
-                        for(let k = 0; k < sameTitle.length; k++){
-
-                            if(sameTitle[k].bypass){
-                                console.log("[+] Bypassing "+sameTitle[k].url + " because it's same that "+tmpDB[i].content[j].url)
-                            } else {
-                                if(sameTitle[k].paragraphs.length != 0){
-                                    if(sameTitle[k].paragraphs.length == tmpDB[i].content[j].paragraphs.length){
-                                        //console.log("Innnnnnnn")
-                                        let same = true
-                                        for(let l = 0; l < sameTitle[k].paragraphs.length; l++){
-                                            //console.log(sameTitle[k].paragraphs[l])
-                                            //console.log(tmpDB[i].content[j].paragraphs[l])
-                                            if(sameTitle[k].paragraphs[l] != tmpDB[i].content[j].paragraphs[l]){
-                                                same = false
-                                            }
-                                        }
-                                        if(same){
-                                            try{
-                                                sameTitle[k].domain = sameTitle[k].url.split('://')[1].split('.onion')[0]+".onion"
-                                                // I need to move the file content in the ./db/bin/
-                                                let dir = "./db/bin/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain+"/"
-                                                Deno.mkdirSync("./db/bin/"+sameTitle[k].domain.split('')[0], { recursive: true })
-            
-                                                //move the dir
-                                                let p = await Deno.run({
-                                                    cmd: ["mv", "./db/data/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain, dir],
-                                                    stdout: "piped",
-                                                    stderr: "piped"
-                                                })
-                                                await p.status()
-            
-                                                Deno.writeTextFileSync(dir+"multiple", tmpDB[i].content[j].url)
-    
-                                                let newURLDATABASE = []
-                                                for(let e = 0; e < urlDatabase.length; e++){
-                                                    if(!urlDatabase[e].startsWith(sameTitle[k].url)){
-                                                        newURLDATABASE.push(urlDatabase[e])
-                                                    }
-                                                }
-                                                urlDatabase = newURLDATABASE
-            
-                                                //remove tmpDB[i].domain form tmpDB
-                                                sameTitle[k].bypass = true
-                                                /*
-                                                if(tmpDB[i].content[j].url != sameTitle[k].url){
-                                                    sameArray.push({
-                                                        urlIn: tmpDB[i].content[j].url,
-                                                        urlOut: sameTitle[k].url
-                                                    })
-                                                }*/
-                                            } catch(err){}
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    tmpDB = tmpDB.filter(x => !x.bypass)
-    console.log("[+] Same site is now clean")
-    sameURL = sameArray
-    db = tmpDB
-    console.log(`Got ${db.length} url`)
-
-    //generateStatistic()
+getDatabase()
+async function getDatabase(){
+    // load the database from plugs databaseLoader.ts
+    db = await loadDatabase(urlDatabase)
 }
 
-async function getAllFileContent(path) {
-    let fileList = await exploreFileSimple(path)
-    let tmp = []
-    for(let i = 0; i < fileList.length; i++){
-        try{
-            tmp.push(JSON.parse(Deno.readTextFileSync(path+"/"+fileList[i])))
-        } catch(err){}
-    }
-    return tmp
-}
-
-async function exploreDirSimple(dir){
-    let tmp = []
-    for await (const dirEntry of Deno.readDir(dir)) {
-        if(dirEntry.isDirectory){
-            tmp.push(dirEntry.name)
-        }
-    }
-    return tmp
-}
-async function exploreFileSimple(dir){
-    let tmp = []
-    for await (const dirEntry of Deno.readDir(dir)) {
-        if(!dirEntry.isDirectory){
-            tmp.push(dirEntry.name)
-        }
-    }
-    return tmp
-}
 
 /*
 How Alina store the data ?
@@ -260,11 +76,11 @@ db/
 |   |   |   +-- infos.json // contains the infos about the domain :lastCheck, lastUpdate, all page title, all page url
 |   |   |   +-- crypto.json // contains the crypto infos about the domain
 |   |   |   +-- content/
-|   |   |   |   +-- [urlToken].json // contains title, external links, internal links, paragraphs, meta
+|   |   |   |   +-- full.json // contains title, external links, internal links, paragraphs, meta
 |   |   |   +-- images/
-|   |   |   |   +-- [urlToken].json // contains all images links and name via URL updater, id="" and name=""
+|   |   |   |   +-- full.json // contains all images links and name via URL updater, id="" and name=""
 |   |   |   +-- videos/
-|   |   |   |   +-- [urlToken].json // contains all videos links and name via URL updater, id="" and name=""
+|   |   |   |   +-- full.json // contains all videos links and name via URL updater, id="" and name=""
 |   +-- b/
 |   |   +-- [...]/
 |   +-- [...]/
@@ -324,7 +140,20 @@ async function main(request:any) {
                     }
                 }
             } else if(request.url.startsWith('/search/')){
-                response = await search(request)
+                response = await makeASearch(request)
+            } else if(request.url.startsWith('/stats/')){
+                if(request.url == "/stats/generate"){
+                    generateStatistic()
+                    response.body = {
+                        status: "ok",
+                        message: "generate stats"
+                    }
+                } else if(request.url == "/stats/value"){
+                    let tmp = Deno.readTextFileSync("./db/statistic.json")
+                    response.body  = tmp ? JSON.parse(tmp) : []
+                } else {
+                    response.status = 418
+                }
             } else {
                 response.status = 404
             }
@@ -334,7 +163,6 @@ async function main(request:any) {
         response.status = 500
     }
 
-
     try{
         response.body = JSON.stringify(response.body)
     }catch(err){}
@@ -343,43 +171,9 @@ async function main(request:any) {
 }
 
 
-async function db_searchViaTitle(title, workdb?) {
-    let filter = false
-    if(!workdb){
-        filter = true
-        workdb = db
-    }
-    let tmp = []
-    for(let i = 0; i < workdb.length; i++){
-        for(let j = 0; j < workdb[i].content.length; j++){
-            if(workdb[i].content[j].title.toLowerCase().includes(title.toLowerCase())){
-                tmp.push(workdb[i].content[j])
-            }
-        }
-    }
 
-    if(filter){
-        //filter content with sameURL array
-        let tmp2 = []
-        let bannedURL = []
-        for(let i = 0; i < tmp.length; i++){
-            let tmpData = sameURL.filter(x => x.urlIn == tmp[i].url)
-            if(tmpData.length > 0){
-                for(let j = 0; j < tmpData.length; j++){
-                    bannedURL.push(tmpData[j].urlOut)
-                }
-            }
-            if(!bannedURL.includes(tmp[i].url)){
-                tmp2.push(tmp[i])
-            }
-        }
-        tmp = tmp2
-    }
 
-    return tmp
-}
-
-async function search(request:any) {
+async function makeASearch(request:any) {
     let response:Response = {}
 
     let body = await betRequestBody(request)
@@ -390,7 +184,7 @@ async function search(request:any) {
         return response
     }
 
-    if(request.url == '/search/title'){
+    if(request.url == '/search/all'){
         //get link by title, soo where content.title contains the title
         if(body.page == null || body.page < 1 || body.page == undefined){
             body.page = 1
@@ -412,83 +206,86 @@ async function search(request:any) {
             res: []
         }
 
-        response.body = await db_searchViaTitle(body.title)
         //filter content with body.filter content
         if(body.filter && body.filter.length > 0){
-            //for earch element in body.filter, we need to filter the response.body
-            let tmp = []
-            for(let i = 0; i < response.body.length; i++){
-                //check in the name and all the paragraphs
-                let found = false
-                for(let j = 0; j < response.body[i].paragraphs.length; j++){
-                    for(let k = 0; k < body.filter.length; k++){
-                        if(response.body[i].paragraphs[j].toLowerCase().includes(body.filter[k].toLowerCase())){
-                            found = true
-                        }
-                    }
-                }
-                //check the title
-                for(let k = 0; k < body.filter.length; k++){
-                    if(response.body[i].title.toLowerCase().includes(body.filter[k].toLowerCase())){
-                        found = true
-                    }
-                }
-
-                if(!found){
-                    tmp.push(response.body[i])
-                }
-            }
-            response.body = tmp
+            response.body = _search.filter(await _search.db_search(body.title, db), body.filter)
+        } else {
+            response.body = await _search.db_search(body.title, db)
         }
-
         if(body.only && body.only.length > 0){
-            //for earch element in body.filter, we need to filter the response.body
-            let tmp = []
-            for(let i = 0; i < response.body.length; i++){
-                //check in the name and all the paragraphs
-                let found = false
-                for(let j = 0; j < response.body[i].paragraphs.length; j++){
-                    for(let k = 0; k < body.only.length; k++){
-                        if(response.body[i].paragraphs[j].toLowerCase().includes(body.only[k].toLowerCase())){
-                            found = true
-                        }
-                    }
-                }
-                //check the title
-                for(let k = 0; k < body.only.length; k++){
-                    if(response.body[i].title.toLowerCase().includes(body.only[k].toLowerCase())){
-                        found = true
-                    }
-                }
-
-                if(found){
-                    tmp.push(response.body[i])
-                }
-            }
-            response.body = tmp
+            response.body = _search.onlyRes(response.body, body.only)
         }
 
         //page max
-
         res.maxPage = Math.ceil(response.body.length/24)
         res.totalRes = response.body.length
 
-        if(res.maxPage == null){
-            res.maxPage = 1
-        }
-
-        if(body.page < res.maxPage){
-            res.next = true
-        }
+        if(res.maxPage == null){ res.maxPage = 1 }
+        if(body.page < res.maxPage){ res.next = true }
 
         if(body.page){
             //24 results per page
             let tmp2 = []
             let max = body.page*24
             let min = max-24
-            if(min < 0){
-                min = 0
+            min = min < 0 ? 0 : min
+            for(let i = min; i < max; i++){
+                if(response.body[i] != null && response.body[i] != undefined){
+                    tmp2.push(response.body[i])
+                }
             }
+            response.body = tmp2
+        }
+
+        res.res = response.body
+        res.resLength = response.body.length
+        response.body = res
+
+    } else if(request.url == '/search/title'){
+        //get link by title, soo where content.title contains the title
+        if(body.page == null || body.page < 1 || body.page == undefined){
+            body.page = 1
+        } else {
+            try{
+                body.page = parseInt(body.page)
+            } catch(err){
+                body.page = 1
+            }
+        }
+
+        let res = {
+            page: body.page,
+            title: body.title,
+            resLength: 0,
+            next: false,
+            maxPage: 0,
+            totalRes: 0,
+            res: []
+        }
+
+        //filter content with body.filter content
+        if(body.filter && body.filter.length > 0){
+            response.body = _search.filter(await _search.db_searchViaTitle(body.title, db), body.filter)
+        } else {
+            response.body = await _search.db_searchViaTitle(body.title, db)
+        }
+        if(body.only && body.only.length > 0){
+            response.body = _search.onlyRes(response.body, body.only)
+        }
+
+        //page max
+        res.maxPage = Math.ceil(response.body.length/24)
+        res.totalRes = response.body.length
+
+        if(res.maxPage == null){ res.maxPage = 1 }
+        if(body.page < res.maxPage){ res.next = true }
+
+        if(body.page){
+            //24 results per page
+            let tmp2 = []
+            let max = body.page*24
+            let min = max-24
+            min = min < 0 ? 0 : min
             for(let i = min; i < max; i++){
                 if(response.body[i] != null && response.body[i] != undefined){
                     tmp2.push(response.body[i])
@@ -592,7 +389,7 @@ async function betRequestBody(request) {
 
 ////// STATS //////
 async function generateStatistic(){
-    console.log("Starting statistic generation")
+    console.log("[@] Starting statistic generation")
     let data = {
         dbSize: db.length,
         lastUpdate: new Date().toLocaleString(),
@@ -622,11 +419,10 @@ async function generateStatistic(){
     }
 
     for(let i = 0; i<data.keyword.length; i++){
-        data.keyword[i].count = (await db_searchViaTitle(data.keyword[i].name)).length
+        data.keyword[i].count = (await _search.db_search(data.keyword[i].name, db)).length
     }
-    
     Deno.writeTextFileSync('./db/statistic.json', JSON.stringify(data))
-    console.log("Statistic generated")
+    console.log("[@] Statistic generated")
 }
 
 async function _stats_countClonnedURL(){
@@ -647,16 +443,18 @@ async function addNewUrl(data) {
     let response:Response = {}
 
     let domain = data.url.split("://")[1].split(".onion")[0]+".onion"
-
-    if(!domainDatabase.includes(domain)){
-        domainDatabase.push(domain)
-    }
+    if(!domainDatabase.includes(domain)){ domainDatabase.push(domain) }
 
     //create the domain directory
     Deno.mkdirSync("./db/data/"+domain.split('')[0]+"/"+domain, { recursive: true })
     Deno.mkdirSync("./db/data/"+domain.split('')[0]+"/"+domain+"/content", { recursive: true })
     Deno.mkdirSync("./db/data/"+domain.split('')[0]+"/"+domain+"/images", { recursive: true })
     Deno.mkdirSync("./db/data/"+domain.split('')[0]+"/"+domain+"/videos", { recursive: true })
+
+    let FULL_content = [], FULL_images = [], FULL_videos = []
+    try{ FULL_content = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/content/full.json")) } catch(err){}
+    try{ FULL_images = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/images/full.json")) } catch(err){}
+    try{ FULL_videos = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/videos/full.json")) } catch(err){}
 
     let urlToken = generateUrlToken()
     let infos = null
@@ -706,11 +504,12 @@ async function addNewUrl(data) {
     content = {
         title: "",
         titles: [],
-        externalLinks: [],
-        internalLinks: [],
+        external: [],
+        internal: [],
         paragraphs: [],
         meta: null,
-        url: data.url
+        url: data.url,
+        domain: domain
     }
     images = data.images
     videos = data.videos
@@ -721,9 +520,35 @@ async function addNewUrl(data) {
     content.meta = data.content.meta
     content.paragraphs = data.content.paragraphs
 
-    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/content/"+urlToken+".json", JSON.stringify(content))
-    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/images/"+urlToken+".json", JSON.stringify(images))
-    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/videos/"+urlToken+".json", JSON.stringify(videos))
+    FULL_content.push(content)
+    
+    if(images.length > 0){
+        //parcour image and add them to the database
+        for(let i = 0; i < images.length; i++){
+            //check if the image is already in the database
+            let tmp = FULL_images.find(image => image.url == images[i].url)
+            if(tmp != null){
+                tmp.urlLIST.push(data.url)
+            } else {
+                images[i].urlLIST = []
+                images[i].urlLIST.push(data.url)
+                FULL_images.push(images[i])
+            }
+        }
+    }
+    if(videos.length > 0){
+        for(let i = 0; i < videos.length; i++){
+            //check if the image is already in the database
+            let tmp = FULL_videos.find(image => image.url == videos[i].url)
+            if(tmp != null){
+                tmp.urlLIST.push(data.url)
+            } else {
+                videos[i].urlLIST = []
+                videos[i].urlLIST.push(data.url)
+                FULL_videos.push(videos[i])
+            }
+        }
+    }
 
     //update crypto
     for(let i =0; i<data.cryptocurrencies.length; i++){
@@ -732,10 +557,14 @@ async function addNewUrl(data) {
         }
     }
 
+    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/content/full.json", JSON.stringify(FULL_content))
+    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/images/full.json", JSON.stringify(FULL_images))
+    Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/videos/full.json", JSON.stringify(FULL_videos))
     Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json", JSON.stringify(crypto))
 
     //now add all the link to url database
     for(let i =0; i<data.content.internal_links.length; i++){
+        data.content.internal_links[i] = "http://"+domain+data.content.internal_links[i]
         if(!urlDatabase.includes(data.content.internal_links[i]) && infos.url.find(x => x.url == data.content.internal_links[i]) == undefined && !urlWaiting.includes(data.content.internal_links[i])){
             urlDatabase.push(data.content.internal_links[i])
         }
@@ -760,8 +589,8 @@ async function addNewUrl(data) {
             infos.email.push(data.email[i])
         }
     }
+
     Deno.writeTextFile("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json", JSON.stringify(infos))
-    //remove URL from waiting list
     urlWaiting.splice(urlWaiting.indexOf(data.url), 1)
     console.log("[@] Url in database: "+urlDatabase.length)
     response.body = "ok"
@@ -773,15 +602,14 @@ function generateUrlToken(){
 }
 
 function randomString(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
+    let result = '';
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
 }
-
 
 console.log(`[@] Alina server is running on ${config.hostname}:${config.port}`);
 for await (const request of server) {
