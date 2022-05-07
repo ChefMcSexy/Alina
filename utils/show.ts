@@ -14,6 +14,7 @@ let text_menu = ink.colorize(`
 [<yellow>1</yellow>] - <blue>Tor indexer (beta)</blue>
 [<yellow>2</yellow>] - <blue>Tor sherlock (soon)</blue>
 [<yellow>3</yellow>] - <blue>Web exploit</blue>
+[<yellow>4</yellow>] - <blue>Osint</blue>
 [<yellow>@</yellow>] - <blue>Exit</blue>`)
 
 
@@ -27,6 +28,10 @@ let web_exploit_menu = ink.colorize(`
 [<yellow>1</yellow>] - <blue>Find subdomain</blue>
 [<yellow>@</yellow>] - <blue>Exit</blue>`)
 
+let osint_menu = ink.colorize(`
+[<yellow>1</yellow>] - <blue>Generate email</blue>
+[<yellow>2</yellow>] - <blue>Check email on website</blue>
+[<yellow>@</yellow>] - <blue>Exit</blue>`)
 
 
 export class show {
@@ -36,7 +41,7 @@ export class show {
 
 
     public showHelp() {
-
+        // ahaha maybe one day
     }
 
     public showMenu() {
@@ -44,6 +49,9 @@ export class show {
     }
     public show_web_exploit_menu() {
         console.log(web_exploit_menu)
+    }
+    public show_osint_menu() {
+        console.log(osint_menu)
     }
 
     public showTorDisclamer(){

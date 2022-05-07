@@ -82,7 +82,16 @@ I think you got the message. Otherwise, just don't
 If you are not able to install me in the tutorial even with the help scripts included, this script is not for you
 
 # Functionalities
-The script explanation is available [here](https://github.com/Sn0wAlice/Alina/wiki/) 🐰
+The script explanation is available [here](https://github.com/Sn0wAlice/Alina/wiki/) 🐰<br>
+The Alina map [here](https://sn0walice.github.io/Alina/)<br>
+
+| Name | Category | Legal disclamer |
+| :--- | :------- | :-------------- |
+| Tor indexer | Tor | **extreme** / educational purposes only |
+| Tor Sherlock | Tor | **extreme** / educational purposes only |
+| Website subdomain finder | web exploit | educational purposes only |
+| Email generator | osint | free to use / 100% legal |
+| Check email on website | osint | free to use / educational purposes only |
 
 # Contributors
 - [Alice Snow](https://github.com/Sn0wAlice)

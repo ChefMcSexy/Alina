@@ -2,7 +2,7 @@
     "name": "Alina Safety Network 🎀",
     "children": [
         {
-            "name": "Tor indexer (beta)",
+            "name": "Tor indexer (beta) 📖",
             "children": [
                 {
                     "name": "Client",
@@ -31,7 +31,7 @@
             "type": "folder"
         },
         {
-            "name": "Tor sherlock (soon)",
+            "name": "Tor sherlock (soon) 🕵️‍♂️",
             "children": [
                 {
                     "name": "This tool is not available yet",
@@ -42,13 +42,41 @@
             "type": "folder"
         },
         {
-            "name": "Web exploit",
+            "name": "Web exploit 🌐",
             "children": [
                 {
                     "name": "Find subdomain",
                     "children": [
                         {
                             "name": "This tool allows you to find subdomains of a domain",
+                            "url": "#",
+                            "type": "url"
+                        }
+                    ],
+                    "type": "folder"
+                }
+            ],
+            "type": "folder"
+        },
+        {
+            "name": "Osint 🥸",
+            "children": [
+                {
+                    "name": "Generate email ✉️",
+                    "children": [
+                        {
+                            "name": "This tool allows you generate email addresses possible to use",
+                            "url": "#",
+                            "type": "url"
+                        }
+                    ],
+                    "type": "folder"
+                },
+                {
+                    "name": "Email on website 💌",
+                    "children": [
+                        {
+                            "name": "This tool check if email is use on websites",
                             "url": "#",
                             "type": "url"
                         }

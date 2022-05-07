@@ -8,6 +8,7 @@ import * as ink from 'https://deno.land/x/ink/mod.ts'
 import { TorSherlock } from './tools/tor_sherlock.ts'
 import { TorIndexer } from './tools/tor_indexer.ts'
 import { WebExploit } from './tools/web_exploit/main.ts'
+import { Osint } from "./tools/osint/main.ts"
 
 //show the welcome message
 _show.showWelcome()
@@ -22,6 +23,8 @@ async function main() {
         new TorSherlock().init()
     } else if (userChoise == "3") {
         await new WebExploit().init()
+    } else if (userChoise == "4") {
+        await new Osint().init()
     } else if (userChoise == "@") {
         console.log("Bye 👋")
         Deno.exit(0);
