@@ -2,4 +2,6 @@ db/
 server/tor_indexer/db
 server/tor_indexer/backup
 
+Alina.wiki/
+
 !server/tor_indexer/db/data/*.md

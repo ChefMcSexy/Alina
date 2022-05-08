@@ -7,6 +7,8 @@ const _utils = new utils()
 
 import { inOnWebsite } from "./isOnWebsite/main.ts"
 
+import { getUserData, renderResult} from "./instagram/main.ts"
+
 import { generateEmailSimple, generateEmailUsername } from "./email/generator.ts"
 
 export class Osint {
@@ -25,6 +27,8 @@ export class Osint {
             return
         } else if(rep == "2") {
             await this.checkEmailIsOnWebsite()
+        } else if(rep == "3") {
+            await this.initInstgramUser()
         } else {
             _show.log('Invalid choice')
         }
@@ -72,5 +76,48 @@ export class Osint {
         Deno.writeTextFileSync("./db/out/" + name, output)
         _show.log(`Saved to ./db/out/${name}`)
     }
+
+    // Instagram part
+    private async initInstgramUser(){
+        _show.log("You can find your session id in your browser's cookie.")
+        _show.log("if you need help type 'help' or '?'")
+        _show.log("if you want to use sessionid of ./db/instagram_sessionid.txt, type 'me'")
+        _show.log("if you want to save sessionid, type 'you_session_id save'")
+        await this.instagramUser()
+    }
     
+    private async instagramUser(){
+        let sessionid = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] a valid sessionid"))
+        if(sessionid == "help" || sessionid == "?"){
+            _show.log("Look at the tutorial: https://github.com/Sn0wAlice/Alina/wiki/Osint#how-to-get-your-sessionid")
+            await this.instagramUser()
+        } else {
+
+            if(sessionid == "me"){
+                try{
+                    sessionid = await Deno.readTextFileSync("./db/instagram_sessionid.txt")
+                } catch(err){
+                    _show.log("Error: file do not exist")
+                    return await this.instagramUser()
+                }
+            } else {
+                let sessionidArr = sessionid.split(" ")
+                if(sessionidArr.length > 1){
+                    if(sessionidArr[1] == "save"){
+                        _show.log("Saving sessionid...")
+                        await Deno.writeTextFileSync("./db/instagram_sessionid.txt", sessionidArr[0])
+                    }
+                }
+                sessionid = sessionidArr[0]
+            }
+
+            let username = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] a instagram username"))
+            let data = await getUserData(username, sessionid)
+            if(data == null){
+                _show.log("Invalid sessionid or username, please try again")
+            } else {
+                renderResult(data)
+            }
+        }
+    }
 }

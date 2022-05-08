@@ -82,6 +82,17 @@
                         }
                     ],
                     "type": "folder"
+                },
+                {
+                    "name": "Instagram 🎉",
+                    "children": [
+                        {
+                            "name": "Get instagram accounts informations",
+                            "url": "#",
+                            "type": "url"
+                        }
+                    ],
+                    "type": "folder"
                 }
             ],
             "type": "folder"

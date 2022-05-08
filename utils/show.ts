@@ -31,6 +31,7 @@ let web_exploit_menu = ink.colorize(`
 let osint_menu = ink.colorize(`
 [<yellow>1</yellow>] - <blue>Generate email</blue>
 [<yellow>2</yellow>] - <blue>Check email on website</blue>
+[<yellow>3</yellow>] - <blue>Instagram user infos</blue>
 [<yellow>@</yellow>] - <blue>Exit</blue>`)
 
 
