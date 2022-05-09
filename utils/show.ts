@@ -26,6 +26,7 @@ The Tor🧄 indexer can index extremely large amount of data and this data can b
 
 let web_exploit_menu = ink.colorize(`
 [<yellow>1</yellow>] - <blue>Find subdomain</blue>
+[<yellow>2</yellow>] - <blue>Dir brutforce</blue>
 [<yellow>@</yellow>] - <blue>Exit</blue>`)
 
 let osint_menu = ink.colorize(`
