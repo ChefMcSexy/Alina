@@ -13,7 +13,7 @@ const _check = new check()
 
 export class TorIndexer {
     // this is the tor indexer system
-    async main(){
+    async init(){
         //first the tor indexer spoiler alert
         _show.showTorDisclamer()
         let disclamerrep = await _utils.listenUserResponse(_show.input("Do you accept the disclaimer? (y/N)"))

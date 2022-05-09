@@ -94,6 +94,7 @@ The Alina map [here](https://sn0walice.github.io/Alina/)<br>
 | Tor indexer | Tor | **extreme** / educational purposes only |
 | Tor Sherlock | Tor | **extreme** / educational purposes only |
 | Website subdomain finder | web exploit | educational purposes only |
+| Website dir brut | web exploit | educational purposes only |
 | Email generator | osint | free to use / 100% legal |
 | Check email on website | osint | free to use / educational purposes only |
 | Get instagram infos | osint | free to use / educational purposes only | 

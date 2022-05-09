@@ -1,38 +1,18 @@
-//All the imports
+import * as ink from 'https://deno.land/x/ink/mod.ts'
 import { show } from './utils/show.ts'
 import { utils } from './utils/utils.ts'
 const _show = new show()
 const _utils = new utils()
-
-import * as ink from 'https://deno.land/x/ink/mod.ts'
-import { TorSherlock } from './tools/tor_sherlock.ts'
-import { TorIndexer } from './tools/tor_indexer.ts'
-import { WebExploit } from './tools/web_exploit/main.ts'
-import { Osint } from "./tools/osint/main.ts"
-
-//show the welcome message
+const array = (await import('./utils/mods.ts')).getAllMods()
 _show.showWelcome()
 
 async function main() {
     _show.showMenu()
     let userChoise = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
-
-    if (userChoise == "1") {
-        await new TorIndexer().main()
-    } else if (userChoise == "2") {
-        new TorSherlock().init()
-    } else if (userChoise == "3") {
-        await new WebExploit().init()
-    } else if (userChoise == "4") {
-        await new Osint().init()
-    } else if (userChoise == "@") {
-        console.log("Bye 👋")
-        Deno.exit(0);
-    } else {
-        console.clear()
-        console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
-    }
-    main()
+    /**
+     * on va pas ce mentir, c'est assez classe de faire ça
+     * au lieu de faire une foret de if esle et de switch case
+     */
+    array.find(x => x.id == userChoise) ? array.find(x => x.id == userChoise).mod.init() : console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
 }
-
 main()

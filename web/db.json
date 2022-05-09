@@ -54,6 +54,17 @@
                         }
                     ],
                     "type": "folder"
+                },
+                {
+                    "name": "Dir brutforce",
+                    "children": [
+                        {
+                            "name": "This tool allows you to brutforce directories on website URL.",
+                            "url": "#",
+                            "type": "url"
+                        }
+                    ],
+                    "type": "folder"
                 }
             ],
             "type": "folder"
