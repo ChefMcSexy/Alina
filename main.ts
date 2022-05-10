@@ -1,10 +1,12 @@
 import * as ink from 'https://deno.land/x/ink/mod.ts'
 import { show } from './utils/show.ts'
+import { dr } from './utils/discordRich.ts'
 import { utils } from './utils/utils.ts'
 const _show = new show()
 const _utils = new utils()
 const array = (await import('./utils/mods.ts')).getAllMods()
 _show.showWelcome()
+new dr()
 
 async function main() {
     _show.showMenu()
