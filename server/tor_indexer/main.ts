@@ -145,7 +145,7 @@ async function main(request:any) {
                 response = await makeASearch(request)
             } else if(request.url.startsWith('/forceload')){
                 getDatabase()
-                response = {
+                response.body = {
                     status: "ok",
                 }
             } else if(request.url.startsWith('/stats/')){

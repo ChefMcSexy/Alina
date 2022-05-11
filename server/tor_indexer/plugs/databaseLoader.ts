@@ -14,7 +14,7 @@ export async function loadDatabase(urlDatabase) {
         for(let j = 0; j < letterDir.length; j++){
             try{
                 let domain = letterDir[j]
-                console.log("[-] Loading: "+domain)
+                //console.log("[-] Loading: "+domain)
                 tmpDomainList.push("./db/data/"+domain.split('')[0]+"/"+domain)
                 let dinfo = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json"))
                 tmpDB.push({
@@ -26,9 +26,7 @@ export async function loadDatabase(urlDatabase) {
                     videos: JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/videos/full.json")),
                     email: dinfo.email
                 })
-            } catch(err){
-                console.log(err)
-            }
+            } catch(err){}
         }
     }
     console.log("[+] Fetching multiples urls")
@@ -45,20 +43,23 @@ export async function loadDatabase(urlDatabase) {
                     //ok we need to delete all the same title where the url domain name is the same
                     let tmpSameTitle = []
                     for(let k = 0; k < sameTitle.length; k++){
-                        if(sameTitle[k].domain != tmpDB[i].domain && sameTitle[k].domain == undefined){
+                        if(sameTitle[k].domain != undefined && sameTitle[k].domain != tmpDB[i].domain && sameTitle[k].domain.length > 0){
                             tmpSameTitle.push(sameTitle[k])
                         }
                     }
                     sameTitle = tmpSameTitle
+
+                    //console.log("[+] Found "+sameTitle.length+" with title included '"+tmpDB[i].content[j].title+"'")
 
                     if(tmpDB[i].content[j] != undefined){
                         for(let k = 0; k < sameTitle.length; k++){
                             if(sameTitle[k].bypass){
                                 console.log("[+] Bypassing "+sameTitle[k].url + " because it's same that "+tmpDB[i].content[j].url)
                             } else {
+                                let same = false
                                 if(sameTitle[k].paragraphs.length > 2){
                                     if(sameTitle[k].paragraphs.length == tmpDB[i].content[j].paragraphs.length){
-                                        let same = true
+                                        same = true
                                         for(let l = 0; l < sameTitle[k].paragraphs.length; l++){
                                             if(sameTitle[k].paragraphs[l] != tmpDB[i].content[j].paragraphs[l]){
                                                 same = false
@@ -78,37 +79,53 @@ export async function loadDatabase(urlDatabase) {
                                             same = false
                                         }
 
-                                        if(same){
-                                            console.log("[+] Found same url: "+tmpDB[i].content[j].url+" and "+sameTitle[k].url)
-                                            try{
-                                                sameTitle[k].domain = sameTitle[k].url.split('://')[1].split('.onion')[0]+".onion"
-                                                // I need to move the file content in the ./db/bin/
-                                                let dir = "./db/bin/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain+"/"
-                                                Deno.mkdirSync("./db/bin/"+sameTitle[k].domain.split('')[0], { recursive: true })
-            
-                                                //move the dir
-                                                let p = await Deno.run({
-                                                    cmd: ["mv", "./db/data/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain, dir],
-                                                    stdout: "piped",
-                                                    stderr: "piped"
-                                                })
-                                                await p.status()
-                                                
-                                                Deno.writeTextFileSync(dir+"multiple", tmpDB[i].content[j].url)
-                                                
-                                                let newURLDATABASE = []
-                                                for(let e = 0; e < urlDatabase.length; e++){
-                                                    if(!urlDatabase[e].startsWith(sameTitle[k].url)){
-                                                        newURLDATABASE.push(urlDatabase[e])
-                                                    }
-                                                }
-                                                urlDatabase = newURLDATABASE
-            
-                                                //remove tmpDB[i].domain form tmpDB
-                                                sameTitle[k].bypass = true
-                                            } catch(err){}
+                                        
+                                    }
+                                }
+                                
+                                if(sameTitle[k].internal.length > 1){
+                                    if(sameTitle[k].title == tmpDB[i].content[j].title && sameTitle[k].url == tmpDB[i].content[j].url){
+                                        let n = true
+                                        for(let l = 0; l < sameTitle[k].internal.length; l++){
+                                            if(sameTitle[k].internal[l] != tmpDB[i].content[j].internal[l] && sameTitle[k].internal[l] != ""){
+                                                n = false
+                                            }
+                                        }
+                                        if(n){
+                                            same = true
                                         }
                                     }
+                                }
+
+                                if(same){
+                                    //console.log("[+] Found same url: "+tmpDB[i].content[j].url+" and "+sameTitle[k].url)
+                                    try{
+                                        sameTitle[k].domain = sameTitle[k].url.split('://')[1].split('.onion')[0]+".onion"
+                                        // I need to move the file content in the ./db/bin/
+                                        let dir = "./db/bin/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain+"/"
+                                        Deno.mkdirSync("./db/bin/"+sameTitle[k].domain.split('')[0], { recursive: true })
+    
+                                        //move the dir
+                                        let p = await Deno.run({
+                                            cmd: ["mv", "./db/data/"+sameTitle[k].domain.split('')[0]+"/"+sameTitle[k].domain, dir],
+                                            stdout: "piped",
+                                            stderr: "piped"
+                                        })
+                                        await p.status()
+                                        
+                                        Deno.writeTextFileSync(dir+"multiple", tmpDB[i].content[j].url)
+                                        
+                                        let newURLDATABASE = []
+                                        for(let e = 0; e < urlDatabase.length; e++){
+                                            if(!urlDatabase[e].startsWith(sameTitle[k].url)){
+                                                newURLDATABASE.push(urlDatabase[e])
+                                            }
+                                        }
+                                        urlDatabase = newURLDATABASE
+    
+                                        //remove tmpDB[i].domain form tmpDB
+                                        sameTitle[k].bypass = true
+                                    } catch(err){}
                                 }
                             }
                         }
