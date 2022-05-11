@@ -32,7 +32,6 @@ export async function loadDatabase(urlDatabase) {
         }
     }
     console.log("[+] Fetching multiples urls")
-    let sameArray = []
     //we need to detect the URL duplications
     for(let i = 0; i < tmpDB.length; i++){
         for(let j = 0; j < tmpDB[i].content.length; j++){

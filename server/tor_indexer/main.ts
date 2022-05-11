@@ -52,7 +52,7 @@ async function loadAllTheData(){
     } catch(err){}
 }
 
-
+let indexingInProgress = false
 //data loader
 setInterval(() => {
     getDatabase()
@@ -60,8 +60,10 @@ setInterval(() => {
 
 getDatabase()
 async function getDatabase(){
+    indexingInProgress = true
     // load the database from plugs databaseLoader.ts
     db = await loadDatabase(urlDatabase)
+    indexingInProgress = false
 }
 
 
@@ -127,7 +129,7 @@ async function main(request:any) {
                 // get the first url to crawl, and move it to the urlWaiting list
                 // if no url to crawl, return null
                 let url = urlDatabase.shift()
-                if(url){
+                if(url && !indexingInProgress){
                     urlWaiting.push(url)
                     response.body = {
                         url: url
@@ -141,6 +143,11 @@ async function main(request:any) {
                 }
             } else if(request.url.startsWith('/search/')){
                 response = await makeASearch(request)
+            } else if(request.url.startsWith('/forceload')){
+                getDatabase()
+                response = {
+                    status: "ok",
+                }
             } else if(request.url.startsWith('/stats/')){
                 if(request.url == "/stats/generate"){
                     generateStatistic()
@@ -316,9 +323,11 @@ async function makeASearch(request:any) {
         let tmp = []
         for(let i = 0; i < db.length; i++){
             for(let j = 0; j < db[i].images.length; j++){
-                if(db[i].images[j].alt.toLowerCase().includes(body.title) || db[i].images[j].id.toLowerCase().includes(body.title) || db[i].images[j].name.toLowerCase().includes(body.title)){
-                    tmp.push(db[i].images[j])
-                }
+                try{
+                    if(db[i].images[j].url.toLowerCase().includes(body.title) || db[i].images[j].alt.toLowerCase().includes(body.title) || db[i].images[j].id.toLowerCase().includes(body.title) || db[i].images[j].name.toLowerCase().includes(body.title)){
+                        tmp.push(db[i].images[j])
+                    } 
+                } catch(err){}
             }
         }
         response.body = tmp
@@ -566,7 +575,8 @@ async function addNewUrl(data) {
     for(let i =0; i<data.content.internal_links.length; i++){
         data.content.internal_links[i] = "http://"+domain+data.content.internal_links[i]
         if(!urlDatabase.includes(data.content.internal_links[i]) && infos.url.find(x => x.url == data.content.internal_links[i]) == undefined && !urlWaiting.includes(data.content.internal_links[i])){
-            urlDatabase.push(data.content.internal_links[i])
+            console.log("add to waiting: "+data.content.internal_links[i])
+            urlDatabase.unshift(data.content.internal_links[i])
         }
     }
     for(let i =0; i<data.content.external_links.length; i++){
