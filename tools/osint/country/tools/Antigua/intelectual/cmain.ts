@@ -24,7 +24,7 @@ async function getBusinessInfos() {
     let name = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] the business name"))
     let t = []
     try {
-        let req = await fetch('https://abipco.gov.ag/api/1.0/services/loadInfoProc', {
+        let req = await fetch('https://thingproxy.freeboard.io/fetch/https://abipco.gov.ag/api/1.0/services/loadInfoProc', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
@@ -49,9 +49,9 @@ async function getBusinessInfos() {
     } else {
         for(let i = 0; i < t.length; i++){
             _show.log(`${ink.colorize("<yellow>["+t[i].EntityID+"]</yellow>")} - ${t[i].EntityName} | ${t[i].EntityNumber}`)
-            _show.log(`Creation date ${t[i].DateOfIncorporation} | Active ${t[i].StatusName == "Active" ? "Yes" : "No"}`)
-            _show.log(`Entreprise Type ${t[i].TypeName} `)
-            _show.log(`Entreprise address ${t[i].PrincipalOfficeAddress} `)
+            _show.log(`Creation date ${ink.colorize("<green>"+t[i].DateOfIncorporation+"</green>")} | Active ${t[i].StatusName == "Active" ? ink.colorize("<green>Yes</green>") : ink.colorize("<red>No</red>")}`)
+            _show.log(`Entreprise Type ${t[i].TypeName.split("\n")[0]}`)
+            _show.log(`Entreprise address ${ink.colorize("<blue>"+t[i].PrincipalOfficeAddress+"</blue>")}\n`)
         }
     }
 }
