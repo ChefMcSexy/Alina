@@ -5,11 +5,11 @@ import { utils } from './utils/utils.ts'
 const _show = new show()
 const _utils = new utils()
 const array = (await import('./utils/mods.ts')).getAllMods()
-_show.showWelcome()
 new dr()
 
 async function main() {
     console.clear()
+    _show.showWelcome()
     _show.showMenu()
     let userChoise = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
     /**
