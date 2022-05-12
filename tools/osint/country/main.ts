@@ -8,7 +8,7 @@ const _utils = new utils()
 export class Osint_country {
     private db = []
     constructor(){
-        this.db = JSON.parse(Deno.readTextFileSync("./tools/osint/country/db/list.json"))
+        this.db = JSON.parse(Deno.readTextFileSync("./tools/osint/country/dbc/list.json"))
     }
 
     async main(){
