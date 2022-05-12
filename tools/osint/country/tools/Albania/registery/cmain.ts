@@ -83,5 +83,3 @@ async function checkNameAvailability(){
     }
 
 }
-
-checkNameAvailability()

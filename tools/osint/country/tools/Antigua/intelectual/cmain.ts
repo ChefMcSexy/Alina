@@ -21,8 +21,7 @@ export async function main(){
 
 async function getBusinessInfos() {
     //get business name
-    //let name = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] the business name"))
-    let name = "test"
+    let name = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] the business name"))
     let t = []
     try {
         let req = await fetch('https://abipco.gov.ag/api/1.0/services/loadInfoProc', {
@@ -56,4 +55,3 @@ async function getBusinessInfos() {
         }
     }
 }
-getBusinessInfos()
