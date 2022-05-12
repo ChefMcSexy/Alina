@@ -15,7 +15,8 @@ export class Osint_country {
         let country = await this.getCountry()
         if(country != null){
             console.clear()
-            _show.log(`You selected ${country}`)
+            _show.showWelcome()
+            _show.log(`You selected ${ink.colorize("<green>"+country+"</green>")}`)
             let m = await this.loadModulesFromCountry(country)
             _show.log(`${m.length} modules available`)
             let str = ""
@@ -50,14 +51,15 @@ export class Osint_country {
 
     //general management
     private async getCountry(){
+        _show.log("+-------------------------------------------------------+")
         _show.log(`There are ${ink.colorize("<green>"+this.db.length+"</green>")} countries available`)
         _show.log(`Enter the country name or code that you want`)
-        let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
+        let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] search"))
         if(rep == "@"){
             return null
         } else {
             rep = rep.toLowerCase()
-            let country = this.db.filter(c => c.name.toLowerCase().includes(rep) || c.code.toLowerCase() == rep)
+            let country = (this.db.filter(c => c.name.toLowerCase().includes(rep) || c.code.toLowerCase() == rep)).slice(0, 10)
             if(country.length > 0){
                 let c = await this.selectCountry(country)
                 if(c == "none"){
@@ -74,7 +76,7 @@ export class Osint_country {
 
     private async selectCountry(list){
         for(let i = 0; i < list.length; i++){
-            _show.log(`${list[i].code} - ${list[i].name}`)
+            _show.log(`${ink.colorize("[<blue>"+list[i].code+"</blue>]")} - ${list[i].name}`)
         }
         _show.log("Enter the code of the country you want")
         let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))

@@ -16,6 +16,8 @@ export class Osint {
     }
 
     private async main() {
+        console.clear()
+        _show.showWelcome()
         //show the main menu
         await _show.show_osint_menu()
         let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))

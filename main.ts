@@ -9,6 +9,7 @@ _show.showWelcome()
 new dr()
 
 async function main() {
+    console.clear()
     _show.showMenu()
     let userChoise = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
     /**
