@@ -73,34 +73,105 @@
             "name": "Osint 🥸",
             "children": [
                 {
-                    "name": "Generate email ✉️",
+                    "name": "Country 🚩",
                     "children": [
                         {
-                            "name": "This tool allows you generate email addresses possible to use",
-                            "url": "#",
-                            "type": "url"
+                            "name": "Albania 🇦🇱",
+                            "children": [
+                                {
+                                    "name": "Albania REGISTRY",
+                                    "url": "#",
+                                    "type": "url"
+                                }
+                            ],
+                            "type": "folder"
+                        },
+                        {
+                            "name": "Antigua 🇦🇬",
+                            "children": [
+                                {
+                                    "name": "Intellectual Property & Commerce | ABIPCO",
+                                    "url": "#",
+                                    "type": "url"
+                                }
+                            ],
+                            "type": "folder"
+                        },
+                        {
+                            "name": "Argentina 🇦🇷",
+                            "children": [
+                                {
+                                    "name": "Find informations on agents of the capital market",
+                                    "url": "#",
+                                    "type": "url"
+                                }
+                            ],
+                            "type": "folder"
+                        },
+                        {
+                            "name": "Australia 🇦🇺",
+                            "children": [
+                                {
+                                    "name": "eSearch Company",
+                                    "url": "#",
+                                    "type": "url"
+                                }
+                            ],
+                            "type": "folder"
                         }
                     ],
                     "type": "folder"
                 },
                 {
-                    "name": "Email on website 💌",
-                    "children": [
-                        {
-                            "name": "This tool check if email is use on websites",
-                            "url": "#",
-                            "type": "url"
-                        }
-                    ],
+                    "name": "Général 💻",
+                    "children": [{
+                        "name": "Generate email ✉️",
+                        "children": [
+                            {
+                                "name": "This tool allows you generate email addresses possible to use",
+                                "url": "#",
+                                "type": "url"
+                            }
+                        ],
+                        "type": "folder"
+                    },
+                    {
+                        "name": "Email on website 💌",
+                        "children": [
+                            {
+                                "name": "This tool check if email is use on websites",
+                                "url": "#",
+                                "type": "url"
+                            }
+                        ],
+                        "type": "folder"
+                    }],
                     "type": "folder"
                 },
                 {
-                    "name": "Instagram 🎉",
+                    "name": "Services 💎",
                     "children": [
                         {
-                            "name": "Get instagram accounts informations",
-                            "url": "#",
-                            "type": "url"
+                            "name": "Discord 🎉",
+                            "children": [
+                                {
+                                    "name": "Get discord accounts informations",
+                                    "url": "#",
+                                    "type": "url"
+                                }
+                            ],
+                            "type": "folder"
+                        },
+                        {
+                            "name": "Instagram 🎉",
+                            "children": [
+                                {
+                                    "name": "Get instagram accounts informations",
+                                    "url": "#",
+                                    "type": "url"
+                                }
+                            ],
+                            "type": "folder"
                         }
                     ],
                     "type": "folder"
@@ -111,3 +182,5 @@
     ],
     "type": "folder"
 }
+
+
