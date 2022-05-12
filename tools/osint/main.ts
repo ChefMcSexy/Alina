@@ -6,6 +6,7 @@ const _utils = new utils()
 
 
 import { Osint_general } from "./general/main.ts"
+import { Osint_country } from "./country/main.ts"
 
 export class Osint {
     public async init(){
@@ -19,11 +20,11 @@ export class Osint {
         let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
 
         if (rep == "1") {
-            await new Osint_general().init()
+            await new Osint_general().main()
         } else if(rep == "2") {
             //todo
         } else if(rep == "3") {
-            //todo
+            await new Osint_country().main()
         } else if(rep == "@") {
             return
         } else {
