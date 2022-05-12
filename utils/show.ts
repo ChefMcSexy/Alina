@@ -11,6 +11,9 @@ export class show {
     show_web_exploit_menu() {
         console.log(ink.colorize(Deno.readTextFileSync("./utils/text/web_exploit_menu")))
     }
+    show_osint_menu_general() {
+        console.log(ink.colorize(Deno.readTextFileSync('./utils/text/osint_menu_general')))
+    }
     show_osint_menu() {
         console.log(ink.colorize(Deno.readTextFileSync('./utils/text/osint_menu')))
     }

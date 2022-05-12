@@ -27,7 +27,7 @@ export async function generateEmailUsername(username){
 
 
 function addPattern(array){
-    let pattern = JSON.parse(Deno.readTextFileSync("./tools/osint/email/pattern.json"))
+    let pattern = JSON.parse(Deno.readTextFileSync("./tools/osint/general/email/pattern.json"))
     let email = []
     for(let i = 0; i < array.length; i++){
         for(let j = 0; j < pattern.length; j++){

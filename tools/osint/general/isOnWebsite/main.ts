@@ -1,7 +1,5 @@
-import { show } from '../../../utils/show.ts'
-import { utils } from '../../../utils/utils.ts'
+import { show } from '../../../../utils/show.ts'
 const _show = new show()
-const _utils = new utils()
 
 // this script check if email is on website
 export class inOnWebsite {
@@ -9,10 +7,10 @@ export class inOnWebsite {
 
     private async loadMod(){
         let tmpmod = []
-        let modCat = await this.exploreDirSimple("./tools/osint/isOnWebsite/mods/")
+        let modCat = await this.exploreDirSimple("./tools/osint/general/isOnWebsite/mods/")
         for(let i = 0; i<modCat.length; i++){
             // need to load all the module
-            let curModule = await this.exploreFileSimple("./tools/osint/isOnWebsite/mods/"+modCat[i]+"/")
+            let curModule = await this.exploreFileSimple("./tools/osint/general/isOnWebsite/mods/"+modCat[i]+"/")
             //add the curmodule to list
             for(let j = 0 ; j<curModule.length; j++){
                 let m = {
@@ -24,7 +22,7 @@ export class inOnWebsite {
             }
         }
         this.mods = tmpmod
-        _show.log(`loaded ${this.mods.length} modules`)
+        _show.log(`loaded ${this.mods.length} websites`)
     }
 
     private async exploreDirSimple(dir){

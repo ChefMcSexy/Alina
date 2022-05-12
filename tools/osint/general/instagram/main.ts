@@ -1,4 +1,4 @@
-import { show } from '../../../utils/show.ts'
+import { show } from '../../../../utils/show.ts'
 import * as ink from 'https://deno.land/x/ink/mod.ts'
 const _show = new show()
 

@@ -320,6 +320,28 @@ async function makeASearch(request:any) {
         response.body = tmp
     } else if(request.url == '/search/images'){
         //get image where alt, src, id, name contains the title
+
+        //get link by title, soo where content.title contains the title
+        if(body.page == null || body.page < 1 || body.page == undefined){
+            body.page = 1
+        } else {
+            try{
+                body.page = parseInt(body.page)
+            } catch(err){
+                body.page = 1
+            }
+        }
+
+        let res = {
+            page: body.page,
+            title: body.title,
+            resLength: 0,
+            next: false,
+            maxPage: 0,
+            totalRes: 0,
+            res: []
+        }
+
         let tmp = []
         for(let i = 0; i < db.length; i++){
             for(let j = 0; j < db[i].images.length; j++){
@@ -331,6 +353,31 @@ async function makeASearch(request:any) {
             }
         }
         response.body = tmp
+
+        //page max
+        res.maxPage = Math.ceil(response.body.length/24)
+        res.totalRes = response.body.length
+
+        if(res.maxPage == null){ res.maxPage = 1 }
+        if(body.page < res.maxPage){ res.next = true }
+
+        if(body.page){
+            //24 results per page
+            let tmp2 = []
+            let max = body.page*24
+            let min = max-24
+            min = min < 0 ? 0 : min
+            for(let i = min; i < max; i++){
+                if(response.body[i] != null && response.body[i] != undefined){
+                    tmp2.push(response.body[i])
+                }
+            }
+            response.body = tmp2
+        }
+
+        res.res = response.body
+        res.resLength = response.body.length
+        response.body = res
     } else if(request.url == '/search/videos'){
         //get image where alt, src, id, name contains the title
         let tmp = []
