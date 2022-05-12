@@ -14,6 +14,9 @@ export class show {
     show_osint_menu_general() {
         console.log(ink.colorize(Deno.readTextFileSync('./utils/text/osint_menu_general')))
     }
+    show_osint_menu_service() {
+        console.log(ink.colorize(Deno.readTextFileSync('./utils/text/osint_services')))
+    }
     show_osint_menu() {
         console.log(ink.colorize(Deno.readTextFileSync('./utils/text/osint_menu')))
     }
