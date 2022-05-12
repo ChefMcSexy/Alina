@@ -79,7 +79,7 @@ export class Osint_country {
         _show.log("Enter the code of the country you want")
         let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
         if(list.filter(c => c.code.toLowerCase() == rep.toLowerCase()).length == 1){
-            return list[0].name
+            return (list.filter(c => c.code.toLowerCase() == rep.toLowerCase()))[0].name
         } else {
             _show.log("Country not found")
             return "none"
