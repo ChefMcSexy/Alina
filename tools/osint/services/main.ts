@@ -92,7 +92,11 @@ export class Osint_services {
             if(data == null){
                 _show.log("Invalid sessionid or username, please try again")
             } else {
-                renderResult(data)
+                try {
+                    await renderResult(data)
+                } catch(err){
+                    _show.log("Error: user do not exist")
+                }
             }
         }
     }
