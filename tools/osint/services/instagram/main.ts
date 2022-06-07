@@ -18,7 +18,10 @@ export async function getUserData(username, sessionid) {
 
 export function renderResult(data) {
     console.log()
-    _show.log(`user ${ink.colorize("<blue>"+data.graphql.user.username+"</blue>")} has ${ink.colorize("<green>"+data.graphql.user.edge_owner_to_timeline_media.count+"</green>")} posts`)
+    try {
+        _show.log(`user ${ink.colorize("<blue>"+data.graphql.user.username+"</blue>")} has ${ink.colorize("<green>"+data.graphql.user.edge_owner_to_timeline_media.count+"</green>")} posts`)
+    } catch(err){}
+    
 
     _show.log(`user login page id: ${ink.colorize("<blue>"+data.logging_page_id+"</blue>")}`)
     _show.log(`user id: ${ink.colorize("<blue>"+data.graphql.user.id+"</blue>")}`)
