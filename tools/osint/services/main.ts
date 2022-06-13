@@ -9,6 +9,8 @@ import { Osint_discord } from "./discord/main.ts"
 
 import { getUserData, renderResult} from "./instagram/main.ts"
 
+import { onlyfansMain } from "./onlyfans/main.ts"
+
 export class Osint_services {
     //Discord part
     public async main() {
@@ -20,6 +22,8 @@ export class Osint_services {
             await this.DiscordOsint()
         } else if(rep == "2") {
             await this.initInstgramUser()
+        } else if(rep == "3") {
+            await this.Onlyfans()
         } else if(rep == "@") {
             return
         } else {
@@ -99,5 +103,12 @@ export class Osint_services {
                 }
             }
         }
+    }
+
+    //Onlyfans part
+    private async Onlyfans(){
+        let username = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] an username"))
+        _show.log("Getting user data...")
+        await onlyfansMain(username)
     }
 }
