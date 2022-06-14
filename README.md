@@ -87,7 +87,7 @@ If you are not able to install me in the tutorial even with the help scripts inc
 
 # Functionalities
 The script explanation is available [here](https://github.com/Sn0wAlice/Alina/wiki/) 🐰<br>
-The Alina map [here](https://sn0walice.github.io/Alina/)<br>
+The Alina functionalities map [here](https://sn0walice.github.io/Alina/)<br>
 
 ## Tor
 | Name | Category | Legal disclamer |
