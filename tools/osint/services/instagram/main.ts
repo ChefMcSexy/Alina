@@ -2,7 +2,7 @@ import { show } from '../../../../utils/show.ts'
 import * as ink from 'https://deno.land/x/ink/mod.ts'
 const _show = new show()
 
-export async function getUserData(username, sessionid) {
+export async function getUserData(username:string, sessionid:string) {
     try {
         let response = await fetch(`https://www.instagram.com/${username}/?__a=1`, {
             method: 'GET',
@@ -16,7 +16,7 @@ export async function getUserData(username, sessionid) {
     return null
 }
 
-export function renderResult(data) {
+export function renderResult(data:any) {
     console.log()
     try {
         _show.log(`user ${ink.colorize("<blue>"+data.graphql.user.username+"</blue>")} has ${ink.colorize("<green>"+data.graphql.user.edge_owner_to_timeline_media.count+"</green>")} posts`)

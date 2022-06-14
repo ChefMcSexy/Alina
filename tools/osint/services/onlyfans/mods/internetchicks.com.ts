@@ -13,7 +13,7 @@
 }
 
 
-async function getPage(username){
+async function getPage(username:string){
 
     let url = `https://internetchicks.com/actress/${username}/`
     let req = await fetch(url)

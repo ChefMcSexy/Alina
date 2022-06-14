@@ -43,7 +43,7 @@ async function checkNameAvailability(){
             "credentials": "include"
         })
         let res = await req.text()
-        tk = req.headers.get("set-cookie").split("__RequestVerificationToken=")[1].split(";")[0]
+        tk = req.headers.get("set-cookie")?.split("__RequestVerificationToken=")[1].split(";")[0] || ""
         ufprt = res.split(`ufprt`)[2].split(`value='`)[1].split(`'`)[0];
     } catch(err){
         console.log(err)

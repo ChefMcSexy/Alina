@@ -24,7 +24,7 @@ export async function main(){
 async function getOrganisation() {
     //get business name
     let name = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] the name"))
-    let t = []
+    let t:any[] = []
     try {
         let req = await fetch('http://www.esearch.net.au/cgi-bin/eCasual', {
             method: 'POST',
@@ -61,7 +61,7 @@ async function getOrganisation() {
 async function getOrganisationDetail() {
     //get business name
     let acn = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] the acn"))
-    let t = {}
+    let t:any = {}
     try {
         let req = await fetch('http://www.esearch.net.au/cgi-bin/eCasual', {
             method: 'POST',
@@ -110,7 +110,7 @@ async function getOrganisationDetail() {
 function parsing(data){
     let t = data.split("detailHeading")[1].split('largeButton')[0]
     let a = t.split("<tr>")
-    let t2 = []
+    let t2:any[] = []
     for(let i = 2; i < a.length; i++){
         try{
             t2.push({
@@ -126,7 +126,7 @@ function parsing(data){
 }
 
 function parsingDetail(data){
-    let t = {
+    let t:any = {
         registrationDate: data.split("Registration Date")[1].split(`class="answer">`)[1].split("<")[0] ? data.split("Registration Date")[1].split(`class="answer">`)[1].split("<")[0] : "",
         deregistrationDate: "",
         reviewDate: "",

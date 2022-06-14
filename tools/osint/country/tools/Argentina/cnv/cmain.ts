@@ -22,7 +22,7 @@ export async function main(){
 async function getBusinessInfos() {
     //get business name
     let name = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] the name"))
-    let t = []
+    let t:any[] = []
     try {
         let req = await fetch('https://thingproxy.freeboard.io/fetch/https://www.cnv.gov.ar/SitioWeb/BuscadorGlobal/DataTableBuscadorGlobal', {
             method: 'POST',

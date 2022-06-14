@@ -1,5 +1,5 @@
 /**
- * Scrapes the dirtyship.com website for influencers onlyfans
+ * Scrapes the prothots.com website for influencers onlyfans
  */
 
  export async function search(username: string) {
@@ -13,7 +13,7 @@
 }
 
 
-async function getPage(username){
+async function getPage(username:string){
 
     let url = `https://prothots.com/category/onlyfans-23/${username}/`
     let req = await fetch(url)

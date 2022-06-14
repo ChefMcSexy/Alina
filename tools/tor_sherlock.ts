@@ -52,7 +52,7 @@ export class TorSherlock {
         _show.log("Please enter the path to your custom IPs list")
         let custom_ips = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] path"))
 
-        let ips = []
+        let ips:any[] = []
         if(custom_ips != ""){
             try{
                 let tmpList = Deno.readTextFileSync(custom_ips).split('\n')
@@ -93,7 +93,7 @@ export class TorSherlock {
     }
 
 
-    private async scan(ips, hostname, homeContent, verbose){
+    private async scan(ips:string[], hostname:string, homeContent:string, verbose:boolean){
         homeContent = homeContent.toLowerCase().split('<title>')[1].split('</title>')[0]
         for(let i = 0; i<ips.length; i++){
             if(ips[i] != ""){
@@ -104,19 +104,19 @@ export class TorSherlock {
                 try{
 
                     let content = await _me.getPage(ips[i], hostname)
-                    content = content.toLowerCase().split('<title>')[1].split('</title>')[0]
+                    content = content?.toLowerCase().split('<title>')[1].split('</title>')[0] || ""
                     
                     //console.log(content)
                     if(content == homeContent){
                         console.log()
                         _show.log(`[<red>+ALERT+</red>] ${ips[i]} is hosting the website !`)
                     } else {
-                        if(verbose){
+                        if(verbose && requestVal != undefined){
                             requestVal.custom_validate("[SAFE]")
                         }
                     }
                 } catch(err){
-                    if(verbose){
+                    if(verbose && requestVal != undefined){
                         requestVal.custom_fail("[ERROR]")
                     }
                 }

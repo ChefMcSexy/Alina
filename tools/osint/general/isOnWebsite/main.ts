@@ -3,7 +3,7 @@ const _show = new show()
 
 // this script check if email is on website
 export class inOnWebsite {
-    private mods = []
+    private mods:any[] = []
 
     private async loadMod(){
         let tmpmod = []
@@ -25,8 +25,8 @@ export class inOnWebsite {
         _show.log(`loaded ${this.mods.length} websites`)
     }
 
-    private async exploreDirSimple(dir){
-        let tmp = []
+    private async exploreDirSimple(dir:string){
+        let tmp:string[] = []
         for await (const dirEntry of Deno.readDir(dir)) {
             if(dirEntry.isDirectory){
                 tmp.push(dirEntry.name)
@@ -35,8 +35,8 @@ export class inOnWebsite {
         return tmp
     }
 
-    private async exploreFileSimple(dir){
-        let tmp = []
+    private async exploreFileSimple(dir:string){
+        let tmp:string[] = []
         for await (const dirEntry of Deno.readDir(dir)) {
             if(!dirEntry.isDirectory){
                 tmp.push(dirEntry.name)
@@ -45,16 +45,16 @@ export class inOnWebsite {
         return tmp
     }
     
-    async main(email){
+    async main(email:string){
         await this.loadMod()
     
         //now the mods are load soo we can do some random shit
-        let res = []
+        let res:any[] = []
 
         // note that email "alina@live-hack.org" is registrated on all the website. so if the script sed "no" this meen there are an error
     
         for(let i = 0; i<this.mods.length; i++){
-            let t = {
+            let t:any = {
                 isOnWebsite: await this.mods[i].mod.main(email),
                 websiteURL: this.mods[i].mod.getURL(),
                 timeStamp: Date.now()

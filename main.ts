@@ -16,7 +16,7 @@ async function main() {
      * on va pas ce mentir, c'est assez classe de faire ça
      * au lieu de faire une foret de if esle et de switch case
      */
-    await array.find(x => x.id == userChoise) ? await array.find(x => x.id == userChoise).mod.init() : console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
+    await array.find(x => x.id == userChoise) ? await array.find(x => x.id == userChoise)?.mod?.init() : console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
     main()
 }
 main()

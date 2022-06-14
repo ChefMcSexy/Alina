@@ -1,7 +1,7 @@
 const ip_regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
 
 export class utils {
-    public async listenUserResponse(text_input) {
+    public async listenUserResponse(text_input:string) : Promise<string> {
         const buf = new Uint8Array(1024);
         await Deno.stdout.write(new TextEncoder().encode(text_input + ": "));
         const n = <number>await Deno.stdin.read(buf);
@@ -9,11 +9,11 @@ export class utils {
     }
 
 
-    public checkIp(ip){
+    public checkIp(ip:string) : boolean {
         return ip_regex.test(ip)
     }
 
-    public checkIps(array){
+    public checkIps(array:string[]){
         for(let ip of array){
             if(ip != ""){
                 if(!this.checkIp(ip)){
@@ -24,8 +24,8 @@ export class utils {
         return true
     }
 
-    public generateAllIps(){
-        let ipList = []
+    public generateAllIps() : string[] {
+        let ipList:string[] = []
         for(let i = 1; i <= 255; i++){
             for(let j = 1; j <= 255; j++){
                 for(let k = 1; k <= 255; k++){
@@ -38,7 +38,7 @@ export class utils {
         return ipList
     }
 
-    public createDatabaseDir(){
+    public createDatabaseDir() : void {
         Deno.mkdirSync("./db", { recursive: true })
     }
 }

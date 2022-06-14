@@ -1,4 +1,4 @@
-export async function createPageRepport(content, url){
+export async function createPageRepport(content:string, url:string){
     let domain
     try{
         domain = url.split("://")[1].split("/")[0]
@@ -7,7 +7,7 @@ export async function createPageRepport(content, url){
     }
 
     
-    let base = {
+    let base:any = {
         "url": url,
         "title": "",
         "meta": {
@@ -182,7 +182,7 @@ export async function createPageRepport(content, url){
             }
         }
         // we need to filter the link and remove the duplicates
-        let tmp = []
+        let tmp:any[] = []
         for(let i = 0; i < base.content.internal_links.length; i++){
             if(!tmp.includes(base.content.internal_links[i].split('\n')[0])){
                 tmp.push(base.content.internal_links[i].split('\n')[0])
@@ -198,7 +198,7 @@ export async function createPageRepport(content, url){
         }
 
         // we need to remove .css .js .ttf .ico links
-        base.content.internal_links = base.content.internal_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico") && !v.includes(".png") && !v.includes(".jpg") && !v.includes(".ico") && !v.includes(".webp"))
+        base.content.internal_links = base.content.internal_links.filter((v:any) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico") && !v.includes(".png") && !v.includes(".jpg") && !v.includes(".ico") && !v.includes(".webp"))
 
         // Step 3.4: get the external links
         if(content.includes("href=")){
@@ -219,9 +219,9 @@ export async function createPageRepport(content, url){
         }
         base.content.external_links = tmp
         // we need to remove .css .js .ttf .ico links
-        base.content.external_links = base.content.external_links.filter((v) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico") && !v.includes(".png") && !v.includes(".jpg") && !v.includes(".ico") && !v.includes(".webp"))
+        base.content.external_links = base.content.external_links.filter((v:any) => !v.includes(".css") && !v.includes(".js") && !v.includes(".ttf") && !v.includes(".ico") && !v.includes(".png") && !v.includes(".jpg") && !v.includes(".ico") && !v.includes(".webp"))
         // only keep .onion links
-        base.content.external_links = base.content.external_links.filter((v) => v.includes(".onion"))
+        base.content.external_links = base.content.external_links.filter((v:any) => v.includes(".onion"))
 
     } catch(err){}
     
@@ -334,7 +334,7 @@ export async function createPageRepport(content, url){
     // Step 6: get all crypto currencies wallet
     // Step 6.1: get the bitcoin wallet based on ^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$
     try{
-        let btcWallets = content.match(/[13][a-km-zA-HJ-NP-Z1-9]{25,34}/g)
+        let btcWallets = content.match(/[13][a-km-zA-HJ-NP-Z1-9]{25,34}/g) || []
         for(let i = 0; i < btcWallets.length; i++){
             let pass = false
             //check if string is not a base64
@@ -367,7 +367,7 @@ export async function createPageRepport(content, url){
 
     // Step 6.2: get the ethereum wallet based on ^0x[a-fA-F0-9]{40}$ (same code that bitcoin)
     try{
-        let ethWallets = content.match(/0x[a-fA-F0-9]{40}/g)
+        let ethWallets = content.match(/0x[a-fA-F0-9]{40}/g) || []
         for(let i = 0; i < ethWallets.length; i++){
             let pass = false
             //check if string is not a base64
@@ -400,7 +400,7 @@ export async function createPageRepport(content, url){
 
     //same for ripple based on ^r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}$
     try{
-        let xrpWallets = content.match(/r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}/g)
+        let xrpWallets = content.match(/r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}/g) || []
         for(let i = 0; i < xrpWallets.length; i++){
             let pass = false
             //check if string is not a base64
@@ -433,7 +433,7 @@ export async function createPageRepport(content, url){
 
     //same for litecoin based on ^[LM3T4Z][a-km-zA-HJ-NP-Z1-9]{25,34}$
     try{
-        let ltc = content.match(/r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}/g)
+        let ltc = content.match(/r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}/g) || []
         for(let i = 0; i < ltc.length; i++){
             let pass = false
             //check if string is not a base64
@@ -466,7 +466,7 @@ export async function createPageRepport(content, url){
     
     // same for monero based on ^4[0-9AB][a-km-zA-HJ-NP-Z1-9]{25,34}$
     try{
-        let xmr = content.match(/r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}/g)
+        let xmr = content.match(/r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{27,34}/g) || []
         for(let i = 0; i < xmr.length; i++){
             let pass = false
             //check if string is not a base64
@@ -499,7 +499,7 @@ export async function createPageRepport(content, url){
 
     // same for email based on [0-9A-Za-z]{0,61}@[0-9A-Za-z-]{2,61}\.[0-9A-Za-z]{2,6}
     try{
-        let email = content.match(/[0-9A-Za-z]{0,61}@[0-9A-Za-z-]{2,61}\.[0-9A-Za-z]{2,6}/g)
+        let email = content.match(/[0-9A-Za-z]{0,61}@[0-9A-Za-z-]{2,61}\.[0-9A-Za-z]{2,6}/g) || []
         for(let i = 0; i < email.length; i++){
             base.email.push(email[i])
         }
@@ -507,7 +507,7 @@ export async function createPageRepport(content, url){
 
     //create an entry parser for bautiful json
     try{
-        let tmpParagraph = []
+        let tmpParagraph:any = []
         for(let i = 0; i < base.content.paragraphs.length; i++){
             let tmp = cleanString(base.content.paragraphs[i])
             if(tmp != ""){
@@ -525,7 +525,7 @@ export async function createPageRepport(content, url){
     return base
 }
 
-function cleanString(string){
+function cleanString(string:string){
     //remove all the spaces
     while(string.includes("  ")){
         string = string.replace("  ", " ")

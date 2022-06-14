@@ -66,7 +66,7 @@ export class Osint_services {
         await this.instagramUser()
     }
     
-    private async instagramUser(){
+    private async instagramUser() : Promise<void> {
         let sessionid = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] a valid sessionid"))
         if(sessionid == "help" || sessionid == "?"){
             _show.log("Look at the tutorial: https://github.com/Sn0wAlice/Alina/wiki/Osint#how-to-get-your-sessionid")

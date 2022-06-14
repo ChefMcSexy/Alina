@@ -45,7 +45,7 @@ export class TorIndexer {
         }
         */
 
-        let data = null
+        let data
         try{
             data = JSON.parse(Deno.readTextFileSync('./db/indexer.json'))
         } catch(err){}
@@ -85,7 +85,7 @@ export class TorIndexer {
     }
 
 
-    private async selectThread(){
+    private async selectThread() : Promise<number>{
         let thread = await _utils.listenUserResponse(_show.input("Enter the thread you want (empty = 1)"))
         if(thread == ""){
             return 1
@@ -104,7 +104,7 @@ export class TorIndexer {
         }
     }
 
-    private async askUserConf(){
+    private async askUserConf() : Promise<any>{
         //need hostname, port, headers_key
         let hostname = await _utils.listenUserResponse(_show.input("Please enter your Alina server hostname"))
         let port = await _utils.listenUserResponse(_show.input("Enter the port of the server (empty for default)"))
@@ -124,13 +124,13 @@ export class TorIndexer {
         }
     }
 
-    private async checkUserConf(conf){
+    private async checkUserConf(conf:any){
         return _check.checkUserIndexerConf(false, conf)
     }
 
     /////// INDEXER ///////
     
-    private async launch(conf, thread){
+    private async launch(conf:any, thread:number){
         /*
             The indexer client do: 
             1. contact the server for link to scrawl
@@ -148,7 +148,7 @@ export class TorIndexer {
         await this.launch(conf, thread)
     }
 
-    private async sendReport(report, conf){
+    private async sendReport(report:any, conf:any){
         try{
             if(!conf.hostname.startsWith("http")){
                 conf.hostname = "http://" + conf.hostname
@@ -169,8 +169,8 @@ export class TorIndexer {
         }
     }
 
-    private async getWork(conf, first){
-        let res = null
+    private async getWork(conf:any, first:boolean) : Promise<string>{
+        let res
         try {
             if(first){
                 if(!conf.hostname.startsWith("http")){
@@ -202,7 +202,7 @@ export class TorIndexer {
         }
     }
 
-    private async getTorPage(url){
+    private async getTorPage(url:string){
         return await _tor.get(url)
     }
 }

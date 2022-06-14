@@ -2,7 +2,7 @@ import { show } from '../../../../utils/show.ts'
 import * as ink from 'https://deno.land/x/ink/mod.ts'
 const _show = new show()
 
-export async function onlyfansMain(username) {
+export async function onlyfansMain(username:string) {
     console.clear()
     let modules = await loadMods()
     _show.log(`[+] Searching for ${username} with ${modules.length} modules`)
@@ -24,7 +24,7 @@ export async function onlyfansMain(username) {
 // Load all the modules
 async function loadMods(){
     let list = await exploreDirSimple("./tools/osint/services/onlyfans/mods/")
-    let modules = []
+    let modules:any[] = []
     for(let i = 0; i < list.length; i++){
         modules.push({
             name: list[i].replace(".ts", ""),
@@ -34,8 +34,8 @@ async function loadMods(){
     return modules
 }
 
-async function exploreDirSimple(dir){
-    let tmp = []
+async function exploreDirSimple(dir:string){
+    let tmp:string[] = []
     for await (const dirEntry of Deno.readDir(dir)) {
         if(!dirEntry.isDirectory){
             tmp.push(dirEntry.name)

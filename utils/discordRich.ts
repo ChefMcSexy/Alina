@@ -15,12 +15,13 @@ export class dr {
               
             await client.setActivity({
                 assets: {
-                      large_image: "alina",
-                      large_text: "Alina"
+                    large_image: "alina",
+                    large_text: "Alina"
                 },
                 details: "Executing Alina safety network on his machine 💗",
                 timestamps: {
-                      start: Date.now(),
+                    start: Date.now(),
+                    end: Date.now() + (1000 * 60 * 60 * 24 * 365)
                 }
             });
         } catch(err){}

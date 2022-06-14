@@ -17,7 +17,7 @@ export class Osint_country {
             console.clear()
             _show.showWelcome()
             _show.log(`You selected ${ink.colorize("<green>"+country+"</green>")}`)
-            let m = await this.loadModulesFromCountry(country)
+            let m:any = await this.loadModulesFromCountry(country)
             _show.log(`${m.length} modules available`)
             let str = ""
             for(let i = 0; i < m.length; i++){
@@ -30,8 +30,7 @@ export class Osint_country {
                 return
             } else {
                 try{
-                    rep = parseInt(rep)
-                    let mod = m.find(m => m.i == rep)
+                    let mod = m.find((m:any) => (m as any).i == parseInt(rep))
                     if(mod != undefined){
                         await mod.mod.main()
                     } else {
@@ -50,16 +49,16 @@ export class Osint_country {
 
 
     //general management
-    private async getCountry(){
+    private async getCountry() : Promise<string>{
         _show.log("+-------------------------------------------------------+")
         _show.log(`There are ${ink.colorize("<green>"+this.db.length+"</green>")} countries available`)
         _show.log(`Enter the country name or code that you want`)
         let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] search"))
         if(rep == "@"){
-            return null
+            return "none"
         } else {
             rep = rep.toLowerCase()
-            let country = (this.db.filter(c => c.name.toLowerCase().includes(rep) || c.code.toLowerCase() == rep)).slice(0, 10)
+            let country = (this.db.filter(c => (c as any).name.toLowerCase().includes(rep) || (c as any).code.toLowerCase() == rep)).slice(0, 10)
             if(country.length > 0){
                 let c = await this.selectCountry(country)
                 if(c == "none"){
@@ -74,7 +73,7 @@ export class Osint_country {
         }
     }
 
-    private async selectCountry(list){
+    private async selectCountry(list:any[]){
         for(let i = 0; i < list.length; i++){
             _show.log(`${ink.colorize("[<blue>"+list[i].code+"</blue>]")} - ${list[i].name}`)
         }
@@ -91,8 +90,8 @@ export class Osint_country {
 
 
     //tools
-    private async loadModulesFromCountry(country){
-        let m = []
+    private async loadModulesFromCountry(country:string){
+        let m:any = []
         let list = await this.exploreDirSimple(`./tools/osint/country/tools/${country}/`)
         for(let i = 0; i < list.length; i++){
             try{
@@ -109,8 +108,8 @@ export class Osint_country {
         return m
     }
 
-    private async exploreDirSimple(dir){
-        let tmp = []
+    private async exploreDirSimple(dir:string){
+        let tmp:string[] = []
         for await (const dirEntry of Deno.readDir(dir)) {
             if(dirEntry.isDirectory){
                 tmp.push(dirEntry.name)

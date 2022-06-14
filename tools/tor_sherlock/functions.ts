@@ -23,7 +23,7 @@ export class tor_sherlock__functions{
         console.log(text_menu_tor_sherlock)
     }
 
-    public log(message){
+    public log(message:string){
         console.log(ink.colorize("[<magenta>Alina</magenta>] "+message))
     }
 
@@ -49,7 +49,7 @@ export class tor_sherlock__functions{
         }
     }
 
-    public async getPageContent(url){
+    public async getPageContent(url:string){
         let req = await fetch(url)
         return await req.text()
     }

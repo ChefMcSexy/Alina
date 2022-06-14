@@ -13,7 +13,7 @@
 }
 
 
-async function getPage(username){
+async function getPage(username:string){
 
     let url = `https://fansleaks.com/actor/${username}/`
     let req = await fetch(url)

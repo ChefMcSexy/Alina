@@ -13,7 +13,7 @@ let domainDatabase = [] //just a list of domains
 let urlDatabase = [] // little bit more complex, a list of urls
 let urlWaiting = []
 let orphenlanIMG = []
-let sameURL = []
+let sameURL:any[] = []
 let db = []
 Deno.mkdirSync("./db/data/", { recursive: true })
 
@@ -176,8 +176,6 @@ async function main(request:any) {
 
     request.respond(response);
 }
-
-
 
 
 async function makeASearch(request:any) {
@@ -434,7 +432,7 @@ async function makeASearch(request:any) {
     return response
 }
 
-async function betRequestBody(request) {
+async function betRequestBody(request:any) {
     try{
         let body = await Deno.readAll(request.body)
         return JSON.parse(new TextDecoder().decode(body))

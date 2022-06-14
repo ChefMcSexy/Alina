@@ -15,7 +15,7 @@
 }
 
 
-async function getPage(username){
+async function getPage(username:string){
 
     let url = `https://axothots.com/search/${username}`
     let req = await fetch(url)

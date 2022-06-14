@@ -1,9 +1,9 @@
 // generate email based on the name & lastname
-export async function generateEmailSimple(name, lastname) {
+export async function generateEmailSimple(name:string, lastname:string) {
     /**
      * All the possible EMAIL
      */
-    let tmp = []
+    let tmp:string[] = []
 
     //general email
     tmp.push(name.toLowerCase()+lastname.toLowerCase())
@@ -19,16 +19,16 @@ export async function generateEmailSimple(name, lastname) {
 }
 
 // generate email based on the username
-export async function generateEmailUsername(username){
-    let tmp = []
+export async function generateEmailUsername(username:string){
+    let tmp:string[] = []
     tmp.push(username.toLowerCase())
     return addPattern(tmp)
 }
 
 
-function addPattern(array){
+function addPattern(array:string[]){
     let pattern = JSON.parse(Deno.readTextFileSync("./tools/osint/general/email/pattern.json"))
-    let email = []
+    let email:string[] = []
     for(let i = 0; i < array.length; i++){
         for(let j = 0; j < pattern.length; j++){
             email.push(array[i]+pattern[j])

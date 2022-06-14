@@ -14,7 +14,7 @@ export class check {
         await checkInternet.fail(fatal)
     }
 
-    async check_torProxy_is_online(fatal){
+    async check_torProxy_is_online(fatal:boolean){
         let checkTorProxy = new validator("Checking Tor proxy is online... ")
         try {
             let testing = await _tor.checkProxyIsOnline(false, false)

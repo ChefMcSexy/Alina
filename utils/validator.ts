@@ -3,7 +3,7 @@ const enc = (s: string) => new TextEncoder().encode(s);
 
 export class validator{
     private message
-    constructor(message){
+    constructor(message: string){
         this.message = ink.colorize("[<magenta>Alina</magenta>] "+message)
         this.init()
     }
@@ -31,12 +31,12 @@ export class validator{
         Deno.exit(1)
     }
 
-    public async custom_validate(message){
+    public async custom_validate(message:string){
         await Deno.stdout.write(enc(`${this.message} ${
             ink.colorize(`<green>${message}</green>\n`)
         }\r`))
     }
-    public async custom_fail(message, fatal?:boolean){
+    public async custom_fail(message:string, fatal?:boolean){
         await Deno.stdout.write(enc(`${this.message} ${
             ink.colorize(`<red>${message}</red>\n`)
         }\r`))

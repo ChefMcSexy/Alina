@@ -6,7 +6,7 @@
 
 import { createHash } from "https://deno.land/std/hash/mod.ts"
 
-export async function main(email){
+export async function main(email:string){
     let exist = {
         isOn: false,
         message: "website is block"

@@ -12,7 +12,7 @@ export async function search(username: string) {
 }
 
 
-async function getPage(username){
+async function getPage(username:string){
 
     let url = `https://influencersgonewild.com/category/${username}/`
     let req = await fetch(url)

@@ -1,5 +1,5 @@
 /**
- * Scrapes the dirtyship.com website for influencers onlyfans
+ * Scrapes the thotslife.com website for influencers onlyfans
  * 
  */
 
@@ -14,7 +14,7 @@
 }
 
 
-async function getPage(username){
+async function getPage(username:string){
 
     let url = `https://thotslife.com/category/onlyfans-17/`
     let req = await fetch(url)

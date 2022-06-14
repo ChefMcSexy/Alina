@@ -14,7 +14,7 @@ export class Osint_general {
         await this.main()
     }
 
-    private async main() {
+    public async main() {
         //show the main menu
         await _show.show_osint_menu_general()
         let rep = await _utils.listenUserResponse(ink.colorize("[<red>You</red>] your choice"))
@@ -65,7 +65,7 @@ export class Osint_general {
         _show.log(`Email ${ink.colorize("<blue>"+email+"</blue>")} has been found on: ${ink.colorize("<green>"+d.filter(x => x.isOnWebsite.isOn).length+"</green>")} website(s)`)
     }
 
-    private saveOutput(output){
+    private saveOutput(output:string){
         Deno.mkdirSync("./db/out/", { recursive: true })
         let name = "out_" + new Date().toISOString().replace(/:/g, "-") + ".txt"
         Deno.writeTextFileSync("./db/out/" + name, output)

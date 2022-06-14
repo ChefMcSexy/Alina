@@ -1,4 +1,4 @@
-export async function main(email){
+export async function main(email:string){
 
 }
 
