@@ -8,9 +8,14 @@ export async function loadDatabase(urlDatabase) {
     let letterDispo = await exploreDirSimple('./db/data/')
     let tmpDomainList = []
     let tmpDB = []
+    
+    //sort the letter
+    letterDispo.sort()
+
     for(let i = 0; i < letterDispo.length; i++){
         let letter = letterDispo[i]
         let letterDir = await exploreDirSimple('./db/data/'+letter+"/")
+        console.log("[+] Loading letter "+letter+" ("+i+"/"+letterDispo.length+") with "+letterDir.length+" domains")
         for(let j = 0; j < letterDir.length; j++){
             try{
                 let domain = letterDir[j]

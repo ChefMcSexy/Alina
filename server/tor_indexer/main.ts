@@ -9,10 +9,10 @@ const config = JSON.parse(Deno.readTextFileSync("./config.json"))
 const server = serve({hostname: config.hostname, port: config.port });
 
 // all the database
-let domainDatabase = [] //just a list of domains
-let urlDatabase = [] // little bit more complex, a list of urls
-let urlWaiting = []
-let orphenlanIMG = []
+let domainDatabase:string[] = [] //just a list of domains
+let urlDatabase:string[] = [] // little bit more complex, a list of urls
+let urlWaiting:string[] = []
+let orphenlanIMG:string[] = []
 let sameURL:any[] = []
 let db = []
 Deno.mkdirSync("./db/data/", { recursive: true })
@@ -113,7 +113,7 @@ async function main(request:any) {
                 }
             } else if(request.url == "/push"){
                 // push new data
-                let body = await betRequestBody(request)
+                let body:any = await betRequestBody(request)
                 if(body != null){
                     //check url is in the waiting list
                     if(urlWaiting.includes(body.url)){
@@ -505,18 +505,18 @@ async function addNewUrl(data) {
     Deno.mkdirSync("./db/data/"+domain.split('')[0]+"/"+domain+"/images", { recursive: true })
     Deno.mkdirSync("./db/data/"+domain.split('')[0]+"/"+domain+"/videos", { recursive: true })
 
-    let FULL_content = [], FULL_images = [], FULL_videos = []
+    let FULL_content:any[] = [], FULL_images:any[] = [], FULL_videos:any[] = []
     try{ FULL_content = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/content/full.json")) } catch(err){}
     try{ FULL_images = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/images/full.json")) } catch(err){}
     try{ FULL_videos = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/videos/full.json")) } catch(err){}
 
     let urlToken = generateUrlToken()
-    let infos = null
-    let crypto = null
-    let content = null
-    let images = null
-    let videos = null
-    let created = false
+    let infos
+    let crypto
+    let content
+    let images
+    let videos
+    let created
     try{
         infos = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/infos.json"))
         created = true
@@ -534,7 +534,11 @@ async function addNewUrl(data) {
     } else {
         infos.lastCheck = Date.now()
         infos.lastUpdate = Date.now()
-        crypto = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json"))
+        try {
+            crypto = JSON.parse(Deno.readTextFileSync("./db/data/"+domain.split('')[0]+"/"+domain+"/crypto.json"))
+        } catch (error) {
+            crypto = []
+        }
     }
 
     if(infos != null){
@@ -626,16 +630,19 @@ async function addNewUrl(data) {
     }
     for(let i =0; i<data.content.external_links.length; i++){
         try{
-            if(data.content_external_links[i].endsWith('.png') || data.content_external_links[i].endsWith('.jpg') || data.content_external_links[i].endsWith('.jpeg') || data.content_external_links[i].endsWith('.gif') || data.content_external_links[i].endsWith('.svg')){
-                if(!orphenlanIMG.includes(data.content_external_links[i])){
-                    orphenlanIMG.push(data.content_external_links[i])
+            if(data.content.external_links[i].endsWith('.png') || data.content.external_links[i].endsWith('.jpg') || data.content.external_links[i].endsWith('.jpeg') || data.content.external_links[i].endsWith('.gif') || data.content.external_links[i].endsWith('.svg')){
+                if(!orphenlanIMG.includes(data.content.external_links[i])){
+                    orphenlanIMG.push(data.content.external_links[i])
                 }
             } else {
                 if(!urlDatabase.includes(data.content.external_links[i])){
+                    console.log("add to waiting: "+data.content.external_links[i])
                     urlDatabase.push(data.content.external_links[i])
                 }
             }
-        } catch(err){}
+        } catch(err){
+            console.log(err)
+        }
     }
 
     //adding the email

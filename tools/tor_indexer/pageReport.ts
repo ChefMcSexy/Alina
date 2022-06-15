@@ -5,7 +5,6 @@ export async function createPageRepport(content:string, url:string){
     } catch(err) {
         return null
     }
-
     
     let base:any = {
         "url": url,
