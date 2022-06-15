@@ -504,6 +504,18 @@ export async function createPageRepport(content:string, url:string){
         }
     } catch(err){}
 
+    //check the crypto currencies duplicates
+    for(let i = 0; i < base.cryptocurrencies.length; i++){
+        for(let j = i + 1; j < base.cryptocurrencies.length; j++){
+            if(base.cryptocurrencies[i].wallet === base.cryptocurrencies[j].wallet){
+                base.cryptocurrencies.splice(j, 1)
+                j--
+            }
+        }
+    }
+    //check the email duplicates
+
+
     //create an entry parser for bautiful json
     try{
         let tmpParagraph:any = []
@@ -521,6 +533,7 @@ export async function createPageRepport(content:string, url:string){
     } catch(err){}
 
     //Done with the page, check JSON
+    //console.log(base.content.external_links.length)
     return base
 }
 

@@ -14,7 +14,7 @@ let urlDatabase:string[] = [] // little bit more complex, a list of urls
 let urlWaiting:string[] = []
 let orphenlanIMG:string[] = []
 let sameURL:any[] = []
-let db = []
+let db:any[] = []
 Deno.mkdirSync("./db/data/", { recursive: true })
 
 try{ domainDatabase = JSON.parse(Deno.readTextFileSync("./db/domains.json")) } catch(err){}
@@ -46,6 +46,11 @@ loadAllTheData()
 async function loadAllTheData(){
     try{
         let add = Deno.readTextFileSync("./db/add").split('\n')
+        for(let i = 0; i < add.length; i++){
+            if(add[i] != ""){
+                add[i] = add[i].split("://")[0].split("/")[0]
+            }
+        }   
         domainDatabase = domainDatabase.concat(add)
         urlDatabase = urlDatabase.concat(add)
         Deno.removeSync("./db/add")
@@ -61,11 +66,77 @@ setInterval(() => {
 getDatabase()
 async function getDatabase(){
     indexingInProgress = true
+
+    //force re-parse all the url
+    reParseAllTheUrl()
+
     // load the database from plugs databaseLoader.ts
     db = await loadDatabase(urlDatabase)
+
+    // generate the graph
+    //console.log("[@] Generating graph")
+    //generateGraphTD()
+    //console.log("[@] Generating graph ok")
+
     indexingInProgress = false
 }
 
+let lastUpdate = Date.now()
+
+//GENERATE GRAPH
+function generateGraphTD(){
+    let graphNode = ""
+    let graphLink = ""
+
+    for(let i = 0; i < db.length; i++){
+        let allExternalLinks:string[] = []
+        let tmp = db[i].content.map((x) => x.external)
+        for(let j = 0; j < tmp.length; j++){
+            for(let k = 0; k < tmp[j].length; k++){
+                if(allExternalLinks.indexOf(tmp[j][k]) == -1){
+                    allExternalLinks.push(tmp[j][k])
+                }
+            }
+        }
+        let domains = onlyKeepDomain(allExternalLinks)
+        for(let j = 0; j < domains.length; j++){
+            if(domains[j] != db[i].domain){
+                //graphLink += `${db[i].domain.split('.')[0]}-->${domains[j].split('.')[0]}\n`
+                graphLink += `${db[i].domain}-->${domains[j]}\n`
+            }
+        }
+
+    }
+
+    let graph = "graph TD \n"+graphNode+"\n\n\n"+graphLink
+
+    Deno.writeTextFileSync("./graph.md", graph)
+}
+
+function onlyKeepDomain(list:string[]) : string[]{
+    let tmp:string[] = []
+    for(let i = 0; i < list.length; i++){
+        tmp.push(list[i].split("://")[1].split("/")[0])
+    }
+    //purge double
+    tmp = tmp.filter((x, i, a) => a.indexOf(x) === i)
+    return tmp
+}
+
+// Re parse all the url in the database
+function reParseAllTheUrl(){
+    let tmp:string[] = []
+    for(let i = 0; i < domainDatabase.length; i++){
+        if(domainDatabase[i].startsWith("http")){
+            domainDatabase[i] = domainDatabase[i].split("//")[1].split("/")[0]
+        } 
+        tmp.push("http://"+domainDatabase[i])
+    }
+
+    //remove double
+    urlDatabase = urlDatabase.concat(tmp)
+    urlDatabase = urlDatabase.filter((x, i, a) => a.indexOf(x) === i)
+}
 
 /*
 How Alina store the data ?
@@ -128,19 +199,44 @@ async function main(request:any) {
             } else if(request.url == "/api/ask"){
                 // get the first url to crawl, and move it to the urlWaiting list
                 // if no url to crawl, return null
-                let url = urlDatabase.shift()
-                if(url && !indexingInProgress){
-                    urlWaiting.push(url)
-                    response.body = {
-                        url: url
+
+                if(!indexingInProgress){
+
+                    if(urlWaiting.length == 0 && !indexingInProgress){
+
+                        //check last update is more than 15 min ago
+                        if(Date.now() - lastUpdate > 15*60*1000){
+                            indexingInProgress = true
+                            db = await loadDatabase(urlDatabase)
+                            reParseAllTheUrl()
+                            indexingInProgress = false
+                            lastUpdate = Date.now()
+                        }
+
                     }
-                } else {
+
+                    let url = urlDatabase.shift()
+                    if(url != null){
+                        urlWaiting.push(url)
+                        response.body = {
+                            url: url
+                        }
+                    } else {
+                        // maybe we need to wait for a new url to be added
+                        // or create a alert system via API to notify the owner
+                        response.body = {
+                            url: "none"
+                        }
+                    }
+                }else {
                     // maybe we need to wait for a new url to be added
                     // or create a alert system via API to notify the owner
                     response.body = {
                         url: "none"
                     }
                 }
+
+                
             } else if(request.url.startsWith('/search/')){
                 response = await makeASearch(request)
             } else if(request.url.startsWith('/forceload')){
