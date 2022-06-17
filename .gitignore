@@ -3,6 +3,8 @@ server/tor_indexer/db
 server/tor_indexer/backup
 tools/web_exploit/data/subdomain.txt
 
+server/tor_indexer/plugs/*.json
+
 Alina.wiki/
 
 !server/tor_indexer/db/data/*.md

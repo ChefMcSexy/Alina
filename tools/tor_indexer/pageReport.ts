@@ -262,6 +262,9 @@ export async function createPageRepport(content:string, url:string){
                             name = names[1]
                         }
                     }
+                    if(!image.startsWith("/")){
+                        image = "/" + image
+                    }
                     if(!image.startsWith('http://') && !image.startsWith('https://')){
                         image = "http://"+domain + image
                     }
@@ -498,7 +501,7 @@ export async function createPageRepport(content:string, url:string){
 
     // same for email based on [0-9A-Za-z]{0,61}@[0-9A-Za-z-]{2,61}\.[0-9A-Za-z]{2,6}
     try{
-        let email = content.match(/[0-9A-Za-z]{0,61}@[0-9A-Za-z-]{2,61}\.[0-9A-Za-z]{2,6}/g) || []
+        let email = content.match(/[0-9A-Za-z]{1,61}@[0-9A-Za-z-]{2,61}\.[0-9A-Za-z]{2,6}/g) || []
         for(let i = 0; i < email.length; i++){
             base.email.push(email[i])
         }
