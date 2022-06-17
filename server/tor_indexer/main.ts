@@ -72,7 +72,7 @@ async function makeASearch(request:any) {
     let body = await betRequestBody(request)
     body.title = body.title.toLowerCase()
 
-    if(body.title.length < 3){
+    if(body.title.length < 2){
         response.body = []
         return response
     }
@@ -92,36 +92,21 @@ async function makeASearch(request:any) {
         page: body.page,
         title: body.title,
         resLength: 0,
-        next: false,
-        maxPage: 0,
-        totalRes: 0,
         res: []
     }
 
     if(request.url == '/search/all'){
-        //todo
-
+        res.res = await _db.searchAll(body.title, body.page)
     } else if(request.url == '/search/title'){
-        //todo
-
-    } else if(request.url == '/search/content'){
-        //todo
-
+        res.res = await _db.searchByTitle(body.title, body.page)
     } else if(request.url == '/search/images'){
-        //todo
-
+        res.res = await _db.searchImage(body.title, body.page)
     } else if(request.url == '/search/videos'){
-        //todo
-
-    } else if(request.url == '/search/email'){
-        //todo
-
-    } else if(request.url == '/search/domainDupli'){
-        //todo
-
-    } else {
-        response.body = []
+        res.res = await _db.searchVideo(body.title, body.page)
     }
+
+    res.resLength = res.res.length
+    response.body = res
 
     let h = new Headers()
     h.append('Content-Type', 'application/json')

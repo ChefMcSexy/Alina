@@ -147,4 +147,39 @@ export class databaseManager {
         waiting = waiting.concat(list)
     }
 
+
+    ///// SEARCH ////
+    public async searchAll(keyword:string, page:number){
+        let min = (page-1)*20
+        let max = page*20
+        //select from pages.titre paragraphs.content
+        let res = await client.query(`SELECT pages.url, pages.title, paragraphs.content FROM pages, paragraphs WHERE paragraphs.pageid = pages.pageid AND paragraphs.content LIKE '%${keyword}%' LIMIT ${min}, ${max}`);
+    
+        return res
+    }
+
+    public async searchByTitle(keyword:string, page:number){
+        let min = (page-1)*20
+        let max = page*20
+        //select from pages.titre paragraphs.content
+        let res = await client.query(`SELECT url, title FROM pages WHERE pages.title LIKE '%${keyword}%' LIMIT ${min}, ${max}`);
+        return res
+    }
+
+    public async searchImage(keyword:string, page:number){
+        let min = (page-1)*20
+        let max = page*20
+        //select from pages.titre paragraphs.content
+        let res = await client.query(`SELECT DISTINCT url, alt, name FROM images WHERE images.alt LIKE '%${keyword}%' OR images.name LIKE '%${keyword}%' LIMIT ${min}, ${max}`);
+        return res
+    }
+
+    public async searchVideo(keyword:string, page:number){
+        let min = (page-1)*20
+        let max = page*20
+        //select from pages.titre paragraphs.content
+        let res = await client.query(`SELECT DISTINCT url, alt, name FROM videos WHERE videos.alt LIKE '%${keyword}%' OR videos.name LIKE '%${keyword}%' LIMIT ${min}, ${max}`);
+        return res
+    }
+
 }
