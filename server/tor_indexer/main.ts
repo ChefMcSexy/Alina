@@ -97,6 +97,8 @@ async function makeASearch(request:any) {
 
     if(request.url == '/search/all'){
         res.res = await _db.searchAll(body.title, body.page)
+    } else if(request.url == '/search/all/full'){
+        res.res = await _db.searchAllFULL(body.title, body.page)
     } else if(request.url == '/search/title'){
         res.res = await _db.searchByTitle(body.title, body.page)
     } else if(request.url == '/search/images'){

@@ -5,18 +5,28 @@ const client = await new Client().connect(conf);
 let waiting:string[] = []
 let making:string[] = []
 try {
-    waiting = JSON.parse(deno.readTextFileSync('./db/waiting.json'))
+    waiting = JSON.parse(Deno.readTextFileSync('./db/waiting.json'))
 } catch (error) {}
 
 if(waiting.length == 0){
     waiting = ['http://livehackzyr2wwos2ca3ygfan3ngvqytpe5ph74pdko55ohv6lgdshyd.onion/']
 }
 
+//purge double
+let tmp = []
+for(let i = 0; i < waiting.length; i++){
+    if(!tmp.includes(waiting[i])){
+        tmp.push(waiting[i])
+    }
+}
+waiting = tmp
+
+console.log("Total url: "+waiting.length)
 
 setInterval(async () => {
     Deno.writeTextFileSync('./db/waiting.json', JSON.stringify(waiting))
     try {
-        let add = (Deno.readTextFileSync('./add')).split('\n')
+        let add = (Deno.readTextFileSync('./add')).replace(/ /g, "\n").split('\n')
         waiting = waiting.concat(add)
         Deno.removeSync('./add')
     } catch (error) {}
@@ -70,7 +80,7 @@ export class databaseManager {
     }
 
     public async addPageContentIfNotExist(domain:string, url:string, title:string, p:string[]) : Promise<void> {
-        title = title.replace(/'/g, "\'");
+        title = title.replace(/'/g, " ");
         //check if the pages exist
         const result = await client.query(`SELECT * FROM pages WHERE url = '${url}'`);
         if (result.length === 0) {
@@ -80,11 +90,15 @@ export class databaseManager {
             // update pages title
             await client.query(`UPDATE pages SET title = '${title}' WHERE url = '${url}'`);
             // delete all paragraphs
-            await client.query(`DELETE FROM paragraphs WHERE pageid = (SELECT pageid FROM pages WHERE url = '${url}')`);
+            try {
+                await client.query(`DELETE * FROM paragraphs WHERE pageid = (SELECT pageid FROM pages WHERE url = '${url}')`);
+            } catch (_err) {}
+           
         }
         
         for(let i = 0; i<p.length; i++) {
             try {
+                p[i] = p[i].replace(/'/g, " ");
                 await client.query(`INSERT INTO paragraphs (pageid, content) VALUES ((SELECT pageid FROM pages WHERE url = ?), ?)`, [url, p[i]]);
             } catch (error) {}
         }
@@ -155,6 +169,12 @@ export class databaseManager {
         //select from pages.titre paragraphs.content
         let res = await client.query(`SELECT pages.url, pages.title, paragraphs.content FROM pages, paragraphs WHERE paragraphs.pageid = pages.pageid AND paragraphs.content LIKE '%${keyword}%' LIMIT ${min}, ${max}`);
     
+        return res
+    }
+
+    public async searchAllFULL(keyword:string, page:number){
+        //select from pages.titre paragraphs.content
+        let res = await client.query(`SELECT pages.url, pages.title, paragraphs.content FROM pages, paragraphs WHERE paragraphs.pageid = pages.pageid AND paragraphs.content LIKE '%${keyword}%'`);
         return res
     }
 

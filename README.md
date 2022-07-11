@@ -116,5 +116,3 @@ Base on [this link](https://doc.cyberdream.space/cybersecu/osint/osint-c-global/
 # Contributors
 - [Alice Snow](https://github.com/Sn0wAlice) 💗
 - [Hecatonchire](https://github.com/hecarch) 🔍
-
-> need to add some custom dns resolver

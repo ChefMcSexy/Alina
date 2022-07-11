@@ -87,17 +87,19 @@ export async function createPageRepport(content:string, url:string){
 
     // Step 3: get the content
     try{
-        if(content.includes("<p")){
-            let paragraphs = content.split("<p")
-            for(let i = 1; i < paragraphs.length; i++){
-                let paragraph = paragraphs[i].split(">")[1].split("</p")[0]
-                //we need to clean the paragraph
-                paragraph = paragraph.replace(/\n/g, "")
-                if(paragraph !== ""){
-                    base.content.paragraphs.push(paragraph)
-                }
-            }
+        //Remove all html balises, and get all the text with regex
+        let c = content.replace(/<\/?[^>]+(>|$)/g, ";")
+        c = c.replace(/\s+/g, " ")
+        while(c.includes(';;')){
+            c = c.replace(/;;/g, " ")
         }
+        while(c.includes('; ;')){
+            c = c.replace(/; ;/g, " ")
+        }
+        while(c.includes('  ')){
+            c = c.replace(/  /g, "")
+        }
+        base.content.paragraphs = c.split(";")
     } catch(err){}
     
 
@@ -229,7 +231,15 @@ export async function createPageRepport(content:string, url:string){
         if(content.includes("src=")){
             let images = content.split("src=")
             for(let i = 1; i < images.length; i++){
-                let image = images[i].split("\"")[1]
+                let image = ""
+                let separator = ""
+                if(images[i].startsWith("\"")){
+                    image = images[i].split("\"")[1]
+                    separator = `"`
+                } else if(images[i].startsWith("'")){
+                    image = images[i].split("'")[1]
+                    separator = `'`
+                }
                 if(image.includes(".jpg") || image.includes(".png") || image.includes(".gif") || image.includes(".jpeg") || image.includes(".webp")){
 
                     let imageData = content.split("src=")[i].split(">")[0]
@@ -240,24 +250,24 @@ export async function createPageRepport(content:string, url:string){
                     let name = ""
                     if(imageData.includes("alt=")){
                         let alts = imageData.split("alt=")
-                        if(alts[1].includes("\"")){
-                            alt = alts[1].split("\"")[1]
+                        if(alts[1].includes(separator)){
+                            alt = alts[1].split(separator)[1]
                         } else {
                             alt = alts[1]
                         }
                     }
                     if(imageData.includes("id=")){
                         let ids = imageData.split("id=")
-                        if(ids[1].includes("\"")){
-                            id = ids[1].split("\"")[1]
+                        if(ids[1].includes(separator)){
+                            id = ids[1].split(separator)[1]
                         } else {
                             id = ids[1]
                         }
                     }
                     if(imageData.includes("name=")){
                         let names = imageData.split("id=")
-                        if(names[1].includes("\"")){
-                            name = names[1].split("\"")[1]
+                        if(names[1].includes(separator)){
+                            name = names[1].split(separator)[1]
                         } else {
                             name = names[1]
                         }
@@ -285,7 +295,15 @@ export async function createPageRepport(content:string, url:string){
         if(content.includes("src=")){
             let videos = content.split("src=")
             for(let i = 1; i < videos.length; i++){
-                let video = videos[i].split("\"")[1]
+                let video = ""
+                let separator = ""
+                if(videos[i].startsWith("\"")){
+                    video = videos[i].split("\"")[1]
+                    separator = `"`
+                } else if(videos[i].startsWith("'")){
+                    video = videos[i].split("'")[1]
+                    separator = `'`
+                }
                 if(video.includes(".mp4") || video.includes(".webm") || video.includes(".ogg") || video.includes(".ogv") || video.includes(".avi") || video.includes(".mov") || video.includes(".wmv") || video.includes(".flv") || video.includes(".mkv")){
 
                     let videoData = content.split("src=")[i].split(">")[0]
@@ -296,24 +314,24 @@ export async function createPageRepport(content:string, url:string){
                     let name = ""
                     if(videoData.includes("alt=")){
                         let alts = videoData.split("alt=")
-                        if(alts[1].includes("\"")){
-                            alt = alts[1].split("\"")[1]
+                        if(alts[1].includes(separator)){
+                            alt = alts[1].split(separator)[1]
                         } else {
                             alt = alts[1]
                         }
                     }
                     if(videoData.includes("id=")){
                         let ids = videoData.split("id=")
-                        if(ids[1].includes("\"")){
-                            id = ids[1].split("\"")[1]
+                        if(ids[1].includes(separator)){
+                            id = ids[1].split(separator)[1]
                         } else {
                             id = ids[1]
                         }
                     }
                     if(videoData.includes("name=")){
                         let names = videoData.split("id=")
-                        if(names[1].includes("\"")){
-                            name = names[1].split("\"")[1]
+                        if(names[1].includes(separator)){
+                            name = names[1].split(separator)[1]
                         } else {
                             name = names[1]
                         }

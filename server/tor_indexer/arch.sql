@@ -26,7 +26,7 @@ create table images(
   	primary key(imageid)
 )
 
-create table video(
+create table videos(
   	videoid int auto_increment,
 	url text,
   	alt text,
