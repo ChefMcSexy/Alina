@@ -24,6 +24,7 @@ waiting = tmp
 console.log("Total url: "+waiting.length)
 
 setInterval(async () => {
+    Deno.mkdirSync('./db', { recursive: true });
     Deno.writeTextFileSync('./db/waiting.json', JSON.stringify(waiting))
     try {
         let add = (Deno.readTextFileSync('./add')).replace(/ /g, "\n").split('\n')

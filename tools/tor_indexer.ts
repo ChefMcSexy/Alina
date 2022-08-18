@@ -49,7 +49,10 @@ export class TorIndexer {
         try{
             data = JSON.parse(Deno.readTextFileSync('./db/indexer.json'))
         } catch(err){}
-        console.log(Deno.readTextFileSync('./art/tor.ascii'))
+        try {
+            console.log(Deno.readTextFileSync('./art/tor.ascii'))
+        } catch(err){}
+        
         _show.log("Please note that your alina server must be running for the following tests to work (./server/tor_indexer.ts)")
         
         let askUserConf = true

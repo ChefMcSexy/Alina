@@ -19,4 +19,5 @@ async function main() {
     await array.find(x => x.id == userChoise) ? await array.find(x => x.id == userChoise)?.mod?.init() : console.log(ink.colorize("~ <magenta>Alina ❤️</magenta>"))
     main()
 }
+Deno.mkdirSync('./db', { recursive: true });
 main()
