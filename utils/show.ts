@@ -1,8 +1,18 @@
 import * as ink from 'https://deno.land/x/ink/mod.ts'
+let { columns, rows } = Deno.consoleSize(Deno.stdout.rid);
 
 export class show {
     showWelcome() : void{
-        console.log(ink.colorize(Deno.readTextFileSync('./utils/text/welcome')))
+
+        if(columns < 80 || rows < 25){
+            console.log("terminal too small")
+            Deno.exit(1)
+        }
+
+        let margin = ""
+        let max = (columns/2) - 38
+        margin = " ".repeat(max)
+        console.log(ink.colorize(Deno.readTextFileSync('./utils/text/welcome').replace(/__MARGIN__/g, margin)))
     }
 
     showMenu() : void {

@@ -32,6 +32,7 @@ create table videos(
   	alt text,
   	id text, 
   	name text, 
+	type text,
   	primary key(videoid)
 )
 

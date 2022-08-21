@@ -7,7 +7,7 @@
 export async function main(email:string){
     let exist = {
         isOn: false,
-        message: "module error, Invertigating..."
+        message: "module error..."
     }
 
     try {

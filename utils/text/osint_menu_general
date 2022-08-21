@@ -1,3 +1,3 @@
-[<yellow>1</yellow>] - <blue>Generate email</blue>
-[<yellow>2</yellow>] - <blue>Check email on website</blue>
-[<yellow>@</yellow>] - <blue>Exit</blue>
+[<yellow>1</yellow>] - <cyan>Generate email</cyan>
+[<yellow>2</yellow>] - <cyan>Check email on website</cyan>
+[<yellow>@</yellow>] - <cyan>Exit</cyan>
