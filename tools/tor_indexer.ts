@@ -1,7 +1,8 @@
-import { Tor } from "https://deno.land/x/tor@0.0.3.9/mod.ts"
+import { Tor } from "https://deno.land/x/tor@0.0.3.10/mod.ts"
 //import { Tor } from "../../../tor/mod.ts"
 import { show } from '../utils/show.ts'
 import { utils } from '../utils/utils.ts'
+import * as ink from 'https://deno.land/x/ink/mod.ts'
 const _show = new show()
 const _utils = new utils()
 const _tor = new Tor()
@@ -49,11 +50,15 @@ export class TorIndexer {
         try{
             data = JSON.parse(Deno.readTextFileSync('./db/indexer.json'))
         } catch(err){}
-        try {
-            console.log(Deno.readTextFileSync('./art/tor.ascii'))
-        } catch(err){}
         
-        _show.log("Please note that your alina server must be running for the following tests to work (./server/tor_indexer.ts)")
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            const message = "Please note that your alina server must be running for the following tests to work (./server/tor_indexer.ts)"
+            console.log(await ink.colorize("[<magenta>Alina</magenta>] "+message))
+        } catch (error) {
+            console.log(error)
+        }
+        
         
         let askUserConf = true
         if(data != null){
@@ -147,7 +152,7 @@ export class TorIndexer {
         let pageContent = await this.getTorPage(workingURL)
         let repport = await createPageRepport(pageContent, workingURL)
         await this.sendReport(repport, conf)
-        _show.torindexerlog(`${thread} : DONE : ${workingURL}`)
+        _show.torindexerlog(`${thread} :   Done   : ${workingURL}`)
         await this.launch(conf, thread)
     }
 

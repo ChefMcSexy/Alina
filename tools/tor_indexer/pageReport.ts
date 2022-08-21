@@ -166,7 +166,9 @@ export async function createPageRepport(content:string, url:string){
                         base.content.internal_links.push("http:"+link)
                     } else {
                         if(link.split('//')[1].split('/')[0].includes(".onion")){
-                            base.content.external_links.push("http:"+link)
+                            if(link.length > 30){
+                                base.content.external_links.push("http:"+link)
+                            }
                         } 
                     }
                 } else if(link.startsWith("/")){
